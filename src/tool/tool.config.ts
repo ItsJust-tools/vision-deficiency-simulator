@@ -1,14 +1,15 @@
-import type { ToolConfig } from '@itsjust/core';
-import packageJson from '../../package.json';
+import type { ToolConfig } from "@itsjust/core";
+import packageJson from "../../package.json";
 
 export const templateBaseVersion = packageJson.version;
 
 const toolConfig = {
-  id: 'vision-deficiency-simulator',
-  name: 'Vision Deficiency Simulator',
-  description: 'Simulate vision deficiencies for accessibility testing. See how your designs look to users with different visual conditions.',
-  version: '1.0.0',
-  exportFormats: ['json', 'png', 'pdf'],
+  id: "vision-deficiency-simulator",
+  name: "Vision Deficiency Simulator",
+  description:
+    "Simulate vision deficiencies for accessibility testing. See how your designs look to users with different visual conditions.",
+  version: "1.0.0",
+  exportFormats: ["json", "png", "pdf"],
   features: {
     export: true,
     autoSave: false,
@@ -18,17 +19,21 @@ const toolConfig = {
     darkMode: true,
   },
   theme: {
-    accent: '#10b981',
-    accentHover: '#059669',
-    accentSubtle: 'rgba(16, 185, 129, 0.08)',
-    brand: 'Vision Deficiency Simulator',
-    icon: '👁️',
+    accent: "#10b981",
+    accentHover: "#059669",
+    accentSubtle: "rgba(16, 185, 129, 0.08)",
+    brand: "Vision Deficiency Simulator",
+    icon: "👁️",
   },
   shortcuts: [
     {
-      title: 'Vision Deficiency Simulator',
+      title: "Vision Deficiency Simulator",
       shortcuts: [
-        { keys: 'Ctrl+Shift+E', label: 'Export', description: 'export results as JSON' },
+        {
+          keys: "Ctrl+Shift+E",
+          label: "Export",
+          description: "export results as JSON",
+        },
       ],
     },
   ],

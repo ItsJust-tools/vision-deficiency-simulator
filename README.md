@@ -47,6 +47,7 @@ NEXT_PUBLIC_URL=https://vision-deficiency-simulator.itsjust.tools
 ## Accessibility Testing
 
 This tool helps you:
+
 - Ensure color combinations are accessible for users with color vision deficiencies
 - Test UI designs that rely on non-color differentiation
 - Verify patterns and shapes are visible for all users

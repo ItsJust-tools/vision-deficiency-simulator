@@ -1,10 +1,10 @@
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@itsjust/core'],
+  transpilePackages: ["@itsjust/core"],
   poweredByHeader: false,
   devIndicators: false,
-  output: 'standalone',
+  output: "standalone",
 
   // Sensible security headers for production
   async headers() {
@@ -16,16 +16,16 @@ const nextConfig: NextConfig = {
       "font-src 'self'",
       "connect-src 'self'",
       "frame-ancestors 'none'",
-    ].join('; ');
+    ].join("; ");
     return [
       {
-        source: '/(.*)',
+        source: "/(.*)",
         headers: [
-          { key: 'Content-Security-Policy', value: csp },
-          { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-XSS-Protection', value: '1; mode=block' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: "Content-Security-Policy", value: csp },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-XSS-Protection", value: "1; mode=block" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
       },
     ];

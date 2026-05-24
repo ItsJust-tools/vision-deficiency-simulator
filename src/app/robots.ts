@@ -6,6 +6,7 @@ export default function robots() {
         allow: "/",
       },
     ],
-    sitemap: (process.env.NEXT_PUBLIC_URL || "http://localhost:3000") + "/sitemap.xml",
+    sitemap:
+      (process.env.NEXT_PUBLIC_URL || "http://localhost:3000") + "/sitemap.xml",
   };
 }

@@ -3,26 +3,29 @@
  * Creates a PDF document with vision deficiency simulation results and accessibility metadata
  */
 
-import type { Exporter } from '@itsjust/core';
+import type { Exporter } from "@itsjust/core";
 
 export const exporter: Exporter = {
-  format: 'pdf',
+  format: "pdf",
   export: async (element, options, stateSerializer) => {
     try {
       // Create a print-friendly container
-      const container = document.createElement('div');
-      container.style.cssText = 'width: 100%; padding: 2rem; font-family: system-ui, -apple-system, sans-serif;';
+      const container = document.createElement("div");
+      container.style.cssText =
+        "width: 100%; padding: 2rem; font-family: system-ui, -apple-system, sans-serif;";
 
       // Add title
-      const title = document.createElement('h1');
-      title.textContent = 'Vision Deficiency Simulator Report';
-      title.style.cssText = 'font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;';
+      const title = document.createElement("h1");
+      title.textContent = "Vision Deficiency Simulator Report";
+      title.style.cssText =
+        "font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;";
 
       // Add metadata section
-      const metadata = document.createElement('div');
-      metadata.style.cssText = 'margin-bottom: 1rem; padding: 1rem; background: #f5f5f5; border-radius: 0.5rem;';
+      const metadata = document.createElement("div");
+      metadata.style.cssText =
+        "margin-bottom: 1rem; padding: 1rem; background: #f5f5f5; border-radius: 0.5rem;";
 
-      const metadataJson = stateSerializer?.() || '{}';
+      const metadataJson = stateSerializer?.() || "{}";
 
       // Create a simple PDF-like structure
       const pdfContent = `%PDF-1.4
@@ -72,22 +75,23 @@ startxref
 254
 %%EOF`;
 
-      const blob = new Blob([pdfContent], { type: 'application/pdf' });
+      const blob = new Blob([pdfContent], { type: "application/pdf" });
 
       return {
         success: true,
         data: blob,
-        filename: options?.filename ?? `vision-deficiency-report-${Date.now()}.pdf`,
-        format: 'pdf',
+        filename:
+          options?.filename ?? `vision-deficiency-report-${Date.now()}.pdf`,
+        format: "pdf",
       };
     } catch (error) {
-      console.error('[PDF Exporter]', error);
+      console.error("[PDF Exporter]", error);
       return {
         success: false,
         data: null,
         filename: options?.filename ?? `vision-deficiency-report-${Date.now()}`,
-        format: 'pdf',
-        error: error instanceof Error ? error.message : 'PDF export failed',
+        format: "pdf",
+        error: error instanceof Error ? error.message : "PDF export failed",
       };
     }
   },
