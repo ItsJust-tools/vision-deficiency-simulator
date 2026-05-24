@@ -442,6 +442,42 @@ declare function useDragAndDropImport({ onImport, acceptedFormats, targetRef, }?
 
 declare function useRelativeTime(dateIso: string | null): string;
 
+interface UseUrlStateOptions {
+    /** Tool ID for the shared URL query param. */
+    toolId: string;
+    /** Serialize current state to a JSON string. Called on share. */
+    serialize: () => string;
+    /** Deserialize a parsed JSON payload back into tool state. */
+    deserialize: (data: unknown) => DeserializeResult<unknown>;
+    /** Called when state is successfully loaded from the URL on mount. */
+    onStateLoaded: (data: unknown) => void;
+    /** Show a toast notification. */
+    showToast: (message: string, type: 'success' | 'error') => void;
+}
+interface UseUrlStateReturn {
+    /** Create a share URL, copy to clipboard (or use Web Share API), and update the address bar. */
+    createShareUrl: (title?: string) => Promise<string | null>;
+    /** Whether a share URL is being created. */
+    isSharing: boolean;
+}
+/**
+ * Hook that reads compressed state from the URL query parameter on mount
+ * and provides `createShareUrl` to serialize and share the current state.
+ *
+ * Uses `lz-string` for compression and supports both the Web Share API
+ * (with a system share dialog) and clipboard fallback.
+ *
+ * @example
+ * const { createShareUrl, isSharing } = useUrlState({
+ *   toolId: 'my-tool',
+ *   serialize: () => JSON.stringify(state),
+ *   deserialize: (data) => tool.deserialize(data),
+ *   onStateLoaded: (data) => setToolData(data as MyState),
+ *   showToast,
+ * });
+ */
+declare function useUrlState(options: UseUrlStateOptions): UseUrlStateReturn;
+
 declare function useKeyboardShortcuts(actions: ToolbarActions, onShowShortcuts: () => void): void;
 
 /**
@@ -583,4 +619,4 @@ type StringKey = keyof (typeof strings)['en'];
  */
 declare function t(key: StringKey, locale?: Locale, ...args: string[]): string;
 
-export { type AutoSaveOptions, ErrorBoundary, ExportEngine, type ExportFormat, type ExportOptions, type ExportResult, type Exporter, type ExporterLoader, type FeatureFlags, ImportExport, type ImportExportProps, type ImportResult, KeyboardShortcutsOverlay, type ShareData, type ShareResult, type ShortcutDef, type ShortcutGroup, type StorageData, StorageManager, ThemeProvider, ThemeScript, ToastProvider, type Tool, type ToolConfig, type ToolExporterDefinition, ToolShell, type ToolState, type ToolTheme, type ToolbarActions, type UseImportOptions, type UseToolResult, createExportEngine, defaultAutoSaveOptions, defaultFeatures, formatLabels, storageManager, t, useDragAndDropImport, useExport, useImport, useKeyboardShortcuts, usePlugins, useRelativeTime, useShare, useStorage, useTheme, useToast, useTool, useToolState };
+export { type AutoSaveOptions, ErrorBoundary, ExportEngine, type ExportFormat, type ExportOptions, type ExportResult, type Exporter, type ExporterLoader, type FeatureFlags, ImportExport, type ImportExportProps, type ImportResult, KeyboardShortcutsOverlay, type ShareData, type ShareResult, type ShortcutDef, type ShortcutGroup, type StorageData, StorageManager, ThemeProvider, ThemeScript, ToastProvider, type Tool, type ToolConfig, type ToolExporterDefinition, ToolShell, type ToolState, type ToolTheme, type ToolbarActions, type UseImportOptions, type UseToolResult, createExportEngine, defaultAutoSaveOptions, defaultFeatures, formatLabels, storageManager, t, useDragAndDropImport, useExport, useImport, useKeyboardShortcuts, usePlugins, useRelativeTime, useShare, useStorage, useTheme, useToast, useTool, useToolState, useUrlState };

@@ -1,28 +1,30 @@
 'use client';
 
 import { useCallback, useRef } from 'react';
-import { downloadShareFile, shareViaWeb } from '@itsjust/core';
+import type { VisionCondition } from '@/tool/types';
 import { visionTool, ToolCanvas, ToolToolbar, ToolSidebar, templateMetadata } from '@/tool';
-import { useToolState, useExport } from '@itsjust/core';
+import { useToolState, useExport, useShare } from '@itsjust/core';
 
 export default function ToolClient() {
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  const toolConfig = visionTool.config;
+
   const state = useToolState<typeof visionTool.initialState>(visionTool.initialState, {
     key: 'vision-deficiency-simulator',
-    maxHistory: 100,
-    autoSaveDelay: 0,
+    maxHistoryEntries: 100,
+    debounceMs: 0,
   });
 
   const { exportTo, supportedFormats, isExporting } = useExport(
     canvasRef,
     toolConfig,
-    state.serialize,
+    () => visionTool.serialize(state.data),
   );
 
-  const toolConfig = visionTool.config;
+  const { downloadShareFile, shareViaWeb } = useShare();
 
-  const handleExport = useCallback(async (format: string) => {
+  const handleExport = useCallback(async (format: 'png' | 'pdf' | 'json' | 'jpeg' | 'webp') => {
     await exportTo(format);
   }, [exportTo]);
 
@@ -33,7 +35,7 @@ export default function ToolClient() {
         imageSrc={state.data.imageSrc}
         activeCondition={state.data.activeCondition}
         intensity={state.data.intensity}
-        onConditionChange={(condition) => state.setData((prev) => ({ ...prev, activeCondition: condition }))}
+        onConditionChange={(condition: VisionCondition) => state.setData((prev) => ({ ...prev, activeCondition: condition }))}
         onIntensityChange={(value) => state.setData((prev) => ({ ...prev, intensity: value }))}
       />
       <ToolCanvas
@@ -54,7 +56,7 @@ export default function ToolClient() {
           onClick={async () => {
             await downloadShareFile({
               toolId: toolConfig.id,
-              content: state.serialize(),
+              content: visionTool.serialize(state.data),
               metadata: { schemaVersion: '1.0' },
             });
           }}
@@ -79,7 +81,7 @@ export default function ToolClient() {
           onClick={async () => {
             await shareViaWeb({
               toolId: toolConfig.id,
-              content: state.serialize(),
+              content: visionTool.serialize(state.data),
               metadata: { schemaVersion: '1.0' },
             });
           }}

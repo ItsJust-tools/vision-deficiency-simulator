@@ -26,3 +26,15 @@ yarn-error.*.log
 
 # lint caches
 .eslintcache
+
+# build output
+packages/core/dist/
+
+# test output
+coverage/
+
+# typescript
+*.tsbuildinfo
+
+# auto-generated next.js env types
+next-env.d.ts

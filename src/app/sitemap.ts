@@ -1,14 +1,13 @@
-import type { MetadataRoute } from 'next';
-import { getPublicSiteUrl } from '@/tool/template-metadata';
-
-const SITE_URL = getPublicSiteUrl();
+import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+
   return [
     {
-      url: SITE_URL,
+      url: `${baseUrl}/`,
       lastModified: new Date(),
-      changeFrequency: 'weekly',
+      changeFrequency: "monthly",
       priority: 1,
     },
   ];

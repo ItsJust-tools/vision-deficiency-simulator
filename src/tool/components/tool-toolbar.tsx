@@ -1,13 +1,14 @@
 'use client';
 
 import { useCallback } from 'react';
+import type { VisionCondition } from '@/tool/types';
 
 interface ToolToolbarProps {
   onExport?: () => void;
   imageSrc?: string;
-  activeCondition: string;
+  activeCondition: VisionCondition;
   intensity: number;
-  onConditionChange?: (condition: string) => void;
+  onConditionChange?: (condition: VisionCondition) => void;
   onIntensityChange?: (value: number) => void;
 }
 
@@ -50,7 +51,7 @@ export function ToolToolbar({
               <label style={{ fontSize: '0.75rem' }}>Condition:</label>
               <select
                 value={activeCondition}
-                onChange={(e) => onConditionChange?.(e.target.value)}
+                onChange={(e) => onConditionChange?.(e.target.value as VisionCondition)}
                 style={{
                   padding: '0.375rem 0.5rem',
                   border: '1px solid var(--border)',

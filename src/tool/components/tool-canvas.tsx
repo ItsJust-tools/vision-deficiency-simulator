@@ -25,6 +25,7 @@ export function ToolCanvas({ imageSrc, activeCondition, intensity, canvasRef, on
   const overlayRef = useRef<HTMLDivElement>(null);
   const [fileName, setFileName] = useState('');
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (imageSrc) {
       setFileName('uploaded-image');
@@ -32,6 +33,7 @@ export function ToolCanvas({ imageSrc, activeCondition, intensity, canvasRef, on
       setFileName('No image uploaded');
     }
   }, [imageSrc]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

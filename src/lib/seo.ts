@@ -1,13 +1,6 @@
 import type { Metadata } from 'next';
 import type { ToolConfig } from '@itsjust/core';
-import { templateMetadata } from '@/tool/template-metadata';
-
-function getPublicSiteUrl(): string {
-  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_URL) {
-    return process.env.NEXT_PUBLIC_URL.replace(/\/+$/, '');
-  }
-  return `https://${templateMetadata.shortName?.toLowerCase().replace(/\s+/g, '-') || 'tool'}.itsjust.tools`;
-}
+import { getPublicSiteUrl, templateMetadata } from '@/tool/template-metadata';
 
 const SITE_URL = getPublicSiteUrl();
 

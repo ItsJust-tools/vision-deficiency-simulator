@@ -9,8 +9,8 @@ export const exporter: Exporter = {
   format: 'webp',
   export: async (element, options, stateSerializer) => {
     try {
-      const { exportElement } = await import('html-to-image');
-      const blob = await exportElement(element, {
+      const { toBlob } = await import('html-to-image');
+      const blob = await toBlob(element, {
         width: element.offsetWidth,
         height: element.offsetHeight,
         quality: 0.85,

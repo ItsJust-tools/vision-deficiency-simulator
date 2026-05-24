@@ -3,10 +3,22 @@ import { defineConfig } from 'tsup';
 export default defineConfig([
   {
     entry: ['src/index.ts'],
-    format: ['esm', 'cjs'],
+    outExtension: () => ({ js: '.mjs' }),
+    format: ['esm'],
     dts: true,
     sourcemap: true,
     clean: true,
+    external: ['next', 'react', 'react-dom'],
+    minify: true,
+    treeshake: true,
+  },
+  {
+    entry: ['src/index.ts'],
+    outExtension: () => ({ js: '.cjs' }),
+    format: ['cjs'],
+    dts: false,
+    sourcemap: true,
+    clean: false,
     external: ['next', 'react', 'react-dom'],
     minify: true,
     treeshake: true,

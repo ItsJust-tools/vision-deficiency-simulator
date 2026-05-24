@@ -1,17 +1,11 @@
-import type { MetadataRoute } from 'next';
-import { getPublicSiteUrl } from '@/tool/template-metadata';
-
-const SITE_URL = getPublicSiteUrl();
-
-export default function robots(): MetadataRoute.Robots {
+export default function robots() {
   return {
     rules: [
       {
-        userAgent: '*',
-        allow: '/',
-        disallow: ['/api/'],
+        userAgent: "*",
+        allow: "/",
       },
     ],
-    sitemap: `${SITE_URL}/sitemap.xml`,
+    sitemap: (process.env.NEXT_PUBLIC_URL || "http://localhost:3000") + "/sitemap.xml",
   };
 }

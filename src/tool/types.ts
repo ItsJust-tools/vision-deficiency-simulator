@@ -48,6 +48,6 @@ export const conditionDescriptions: Record<VisionCondition, string> = {
   achromatopsia: 'Complete color blindness (achromatopsia) - no color perception',
   cataracts: 'Age-related cataracts - causes clouding and yellowing of the lens',
   glaucoma: 'Advanced glaucoma - causes peripheral vision loss',
-  diabetic_retinopathy: 'Diabetic retinopathy - affects blood vessels in the retina',
+  'diabetic-retinopathy': 'Diabetic retinopathy - affects blood vessels in the retina',
   normal: 'Normal vision - no simulation applied',
 };
