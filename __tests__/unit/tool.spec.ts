@@ -75,6 +75,7 @@ describe("Vision Deficiency Simulator Tool", () => {
 
       const result = visionTool.deserialize(data);
       expect(result.success).toBe(true);
+      if (!result.success) return;
       expect(result.data.activeCondition).toBe("deuteranopia");
       expect(result.data.intensity).toBe(100);
     });
@@ -82,6 +83,7 @@ describe("Vision Deficiency Simulator Tool", () => {
     it("should fail to deserialize invalid state", () => {
       const result = visionTool.deserialize("invalid");
       expect(result.success).toBe(false);
+      if (result.success) return;
       expect(result.error).toContain("Invalid data format");
     });
 
