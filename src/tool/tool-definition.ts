@@ -52,5 +52,9 @@ export const visionTool: Tool<VisionState> = {
       error: 'Invalid data format: expected { uploadMode: boolean, imageSrc?: string, activeCondition: string, intensity: number, results?: SimulationResult[], notes?: string }',
     };
   },
-  exporters: [],
+  exporters: [
+    { format: 'png', loader: () => import('./exporters/png') },
+    { format: 'webp', loader: () => import('./exporters/webp') },
+    { format: 'pdf', loader: () => import('./exporters/pdf') },
+  ],
 };
