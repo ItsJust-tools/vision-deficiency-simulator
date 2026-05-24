@@ -64,16 +64,16 @@ describe('Vision Deficiency Simulator Tool', () => {
 
   describe('deserialize', () => {
     it('should deserialize valid state', () => {
-      const serialized = JSON.stringify({
+      const data = {
         uploadMode: false,
         imageSrc: 'data:image/png;base64,...',
         activeCondition: 'deuteranopia',
         intensity: 100,
         results: [],
         notes: '',
-      });
+      };
 
-      const result = visionTool.deserialize(serialized);
+      const result = visionTool.deserialize(data);
       expect(result.success).toBe(true);
       expect(result.data.activeCondition).toBe('deuteranopia');
       expect(result.data.intensity).toBe(100);
@@ -86,10 +86,10 @@ describe('Vision Deficiency Simulator Tool', () => {
     });
 
     it('should fail to deserialize missing activeCondition', () => {
-      const result = visionTool.deserialize(JSON.stringify({
+      const result = visionTool.deserialize({
         uploadMode: true,
         imageSrc: '',
-      }));
+      });
       expect(result.success).toBe(false);
     });
   });
