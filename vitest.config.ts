@@ -19,6 +19,7 @@ export default defineConfig({
       "__tests__/**/*.spec.{ts,tsx}",
       "packages/core/__tests__/**/*.test.{ts,tsx}",
     ],
+    exclude: ["__tests__/e2e/**"],
     setupFiles: ["./vitest.setup.ts"],
   },
 });
