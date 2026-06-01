@@ -12,6 +12,8 @@ export interface VisionFilter {
   name: VisionCondition;
   description: string;
   cssFilter: string;
+  /** If set, renders a CSS mask overlay instead of applying filter CSS */
+  maskOverlay?: boolean;
 }
 
 export interface SimulationResult {
@@ -59,8 +61,8 @@ export const visionFilters: VisionFilter[] = [
   {
     name: "glaucoma",
     description: "Advanced glaucoma",
-    cssFilter:
-      "radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%)",
+    cssFilter: "brightness(1.0) contrast(1.05)",
+    maskOverlay: true,
   },
   {
     name: "diabetic-retinopathy",

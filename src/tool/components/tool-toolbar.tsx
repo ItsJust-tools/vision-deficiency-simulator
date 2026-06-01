@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import type { VisionCondition } from "@/tool/types";
+import { visionFilters } from "@/tool/types";
 
 interface ToolToolbarProps {
   onExport?: () => void;
@@ -72,18 +73,9 @@ export function ToolToolbar({
                 }}
                 aria-label="Select vision condition"
               >
-                {[
-                  "normal",
-                  "protanopia",
-                  "deuteranopia",
-                  "tritanopia",
-                  "achromatopsia",
-                  "cataracts",
-                  "glaucoma",
-                  "diabetic-retinopathy",
-                ].map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                {visionFilters.map((f) => (
+                  <option key={f.name} value={f.name}>
+                    {f.description}
                   </option>
                 ))}
               </select>

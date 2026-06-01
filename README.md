@@ -3,6 +3,8 @@
 A client-side WCAG accessibility tool for simulating vision deficiencies. Test how your designs, UI, and content appear to users with different visual conditions.
 
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](https://github.com/ItsJust-tools/vision-deficiency-simulator)
+[![CI](https://github.com/ItsJust-tools/vision-deficiency-simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/ItsJust-tools/vision-deficiency-simulator/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ItsJust-tools/vision-deficiency-simulator/blob/main/LICENSE)
 
 ## Features
 

@@ -159,5 +159,5 @@ jobs:
 
       - name: E2E tests
         run: npm run test:e2e
-        if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.ref == 'refs/heads/main' && !github.actor == 'EntchenEric')
+        if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.ref == 'refs/heads/main' && github.actor != 'EntchenEric')
         timeout-minutes: 10

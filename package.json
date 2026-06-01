@@ -1,7 +1,13 @@
 {
   "name": "vision-deficiency-simulator",
   "version": "1.0.0",
+  "description": "A client-side WCAG accessibility tool for simulating vision deficiencies. Test how your designs, UI, and content appear to users with different visual conditions.",
+  "license": "MIT",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ItsJust-tools/vision-deficiency-simulator.git"
+  },
   "workspaces": [
     "packages/*"
   ],

@@ -59,6 +59,9 @@ export default function ToolClient() {
         activeCondition={state.data.activeCondition}
         intensity={state.data.intensity}
         canvasRef={canvasRef}
+        onUpload={(imageSrc) =>
+          state.setData((prev) => ({ ...prev, imageSrc }))
+        }
       />
       <ToolSidebar
         imageSrc={state.data.imageSrc}

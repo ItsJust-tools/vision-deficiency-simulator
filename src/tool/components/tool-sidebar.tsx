@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { visionFilters, type VisionCondition } from "@/tool/types";
 
 interface ToolSidebarProps {
   imageSrc?: string;
@@ -13,42 +13,9 @@ export function ToolSidebar({
   activeCondition,
   intensity,
 }: ToolSidebarProps) {
-  const handleFileUpload = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          if (event.target?.result) {
-            // Update state would go here
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-    [],
+  const activeFilter = visionFilters.find(
+    (f) => f.name === activeCondition,
   );
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          // Update state would go here
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  }, []);
 
   return (
     <div className="vision-sidebar">
@@ -65,33 +32,11 @@ export function ToolSidebar({
           >
             Drag and drop an image or click to browse
           </p>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            style={{ display: "none" }}
-            id="sidebar-file-upload"
-          />
-          <label
-            htmlFor="sidebar-file-upload"
-            style={{
-              padding: "0.75rem 1rem",
-              border: "1px dashed var(--border)",
-              borderRadius: "var(--radius)",
-              background: "var(--card)",
-              color: "var(--muted)",
-              cursor: "pointer",
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            Click to upload
-          </label>
         </div>
       )}
 
       {/* Condition Info */}
-      {imageSrc && (
+      {imageSrc && activeFilter && (
         <div className="sidebar-section">
           <h3>Current Condition</h3>
           <div
@@ -107,20 +52,8 @@ export function ToolSidebar({
           >
             <span style={{ fontSize: "2rem" }}>👁️</span>
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <span style={{ fontWeight: 600 }}>{activeCondition}</span>
-              <span style={{ fontSize: "0.6875rem", color: "var(--muted)" }}>
-                {[
-                  "normal",
-                  "protanopia",
-                  "deuteranopia",
-                  "tritanopia",
-                  "achromatopsia",
-                  "cataracts",
-                  "glaucoma",
-                  "diabetic-retinopathy",
-                ]
-                  .find((c) => c === activeCondition)
-                  ?.replace("-", " ")}
+              <span style={{ fontWeight: 600 }}>
+                {activeFilter.description}
               </span>
             </div>
           </div>
@@ -136,15 +69,6 @@ export function ToolSidebar({
             >
               Simulation Intensity: {intensity}%
             </label>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={intensity}
-              onChange={(e) => {}}
-              style={{ width: "100%" }}
-              aria-label="Simulation intensity"
-            />
           </div>
         </div>
       )}
