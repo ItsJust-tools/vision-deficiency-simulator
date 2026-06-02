@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   devIndicators: false,
   output: "standalone",
+  images: {
+    unoptimized: true,
+  },
 
   // Sensible security headers for production
   async headers() {

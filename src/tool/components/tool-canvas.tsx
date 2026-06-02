@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { visionFilters, type VisionCondition } from "@/tool/types";
 
 interface ToolCanvasProps {
@@ -33,7 +34,11 @@ export function ToolCanvas({
 
   const activeFilter = visionFilters.find(
     (f) => f.name === activeCondition,
-  ) || { name: "normal" as VisionCondition, description: "", cssFilter: "none" };
+  ) || {
+    name: "normal" as VisionCondition,
+    description: "",
+    cssFilter: "none",
+  };
 
   const isGlaucoma = activeCondition === "glaucoma";
 
@@ -89,7 +94,11 @@ export function ToolCanvas({
       {/* Upload/View Toggle */}
       <div className="vision-header">
         {!imageSrc ? (
-          <div className="upload-mode">
+          <div
+            className="upload-mode"
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          >
             <div className="upload-instruction">
               <p>Drag & drop an image here, or</p>
               <input
@@ -127,14 +136,17 @@ export function ToolCanvas({
                 overflow: "hidden",
               }}
             >
-              <img
+              <Image
                 src={imageSrc}
                 alt="Uploaded image"
+                width={1200}
+                height={800}
                 style={{
                   maxWidth: "100%",
                   maxHeight: "80vh",
                   objectFit: "contain",
                 }}
+                unoptimized
               />
               {/* Vision Filter Overlay */}
               {isGlaucoma ? (

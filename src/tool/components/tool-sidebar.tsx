@@ -1,6 +1,6 @@
 "use client";
 
-import { visionFilters, type VisionCondition } from "@/tool/types";
+import { visionFilters } from "@/tool/types";
 
 interface ToolSidebarProps {
   imageSrc?: string;
@@ -13,9 +13,7 @@ export function ToolSidebar({
   activeCondition,
   intensity,
 }: ToolSidebarProps) {
-  const activeFilter = visionFilters.find(
-    (f) => f.name === activeCondition,
-  );
+  const activeFilter = visionFilters.find((f) => f.name === activeCondition);
 
   return (
     <div className="vision-sidebar">
