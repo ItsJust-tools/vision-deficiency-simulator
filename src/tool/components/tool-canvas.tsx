@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import Image from "next/image";
 import { visionFilters, type VisionCondition } from "@/tool/types";
 
@@ -20,17 +20,9 @@ export function ToolCanvas({
   onUpload,
 }: ToolCanvasProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const [fileName, setFileName] = useState("");
 
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    if (imageSrc) {
-      setFileName("uploaded-image");
-    } else {
-      setFileName("No image uploaded");
-    }
-  }, [imageSrc]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  // Derived from imageSrc — no separate state needed
+  const fileName = imageSrc ? "uploaded-image" : "No image uploaded";
 
   const activeFilter = visionFilters.find(
     (f) => f.name === activeCondition,
@@ -49,7 +41,6 @@ export function ToolCanvas({
         const reader = new FileReader();
         reader.onload = (event) => {
           if (event.target?.result) {
-            setFileName(file.name);
             onUpload?.(event.target.result as string);
           }
         };
@@ -74,7 +65,6 @@ export function ToolCanvas({
         const reader = new FileReader();
         reader.onload = (event) => {
           if (event.target?.result) {
-            setFileName(file.name);
             onUpload?.(event.target.result as string);
           }
         };
