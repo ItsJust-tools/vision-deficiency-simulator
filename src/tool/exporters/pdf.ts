@@ -24,7 +24,9 @@ export const exporter: Exporter = {
       const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "");
       const pdfBytes = buildPdf(base64Data);
 
-      const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
+      const blob = new Blob([new Uint8Array(pdfBytes)], {
+        type: "application/pdf",
+      });
 
       return {
         success: true,
@@ -140,7 +142,15 @@ stream
   // No — let me restructure: append obj6 separately
 
   // Actually let me rebuild with proper structure
-  return buildPdfProper(header, [obj1, obj2, obj3, obj4], obj5Header, rawImageData, obj5Footer, obj6, encoder);
+  return buildPdfProper(
+    header,
+    [obj1, obj2, obj3, obj4],
+    obj5Header,
+    rawImageData,
+    obj5Footer,
+    obj6,
+    encoder,
+  );
 }
 
 function buildPdfProper(
@@ -190,10 +200,14 @@ function buildPdfProper(
   // xref and trailer
   const xrefSize = offsets.length;
   const xrefEntries = offsets
-    .map((o, i) => `${String(o).padStart(10, "0")} ${i === 0 ? "65535 f" : "00000 n"}`)
+    .map(
+      (o, i) =>
+        `${String(o).padStart(10, "0")} ${i === 0 ? "65535 f" : "00000 n"}`,
+    )
     .join("\r\n");
 
-  const trailerStr = `\nxref\n0 ${xrefSize}\n${xrefEntries}\r\n` +
+  const trailerStr =
+    `\nxref\n0 ${xrefSize}\n${xrefEntries}\r\n` +
     `trailer\n<< /Size ${xrefSize} /Root 1 0 R >>\n` +
     `startxref\n${cursor}\n%%EOF`;
 

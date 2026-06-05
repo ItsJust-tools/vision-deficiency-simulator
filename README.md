@@ -63,22 +63,22 @@ npm test
 
 ## Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
+| Variable          | Required       | Default                 | Description           |
+| ----------------- | -------------- | ----------------------- | --------------------- |
 | `NEXT_PUBLIC_URL` | For production | `http://localhost:3000` | Public deployment URL |
 
 ## How the Simulations Work
 
 All simulations are applied client-side using CSS filter functions and overlay effects:
 
-| Condition | Technique |
-|-----------|-----------|
-| **Protanopia** | `hue-rotate(130deg) saturate(1.5)` |
-| **Deuteranopia** | `hue-rotate(110deg) saturate(1.3)` |
-| **Tritanopia** | `hue-rotate(-150deg) saturate(1.2)` |
-| **Achromatopsia** | `grayscale(100%)` |
-| **Cataracts** | `blur(1px) sepia(0.5) brightness(1.1)` |
-| **Glaucoma** | CSS radial-gradient vignette overlay |
+| Condition                | Technique                                         |
+| ------------------------ | ------------------------------------------------- |
+| **Protanopia**           | `hue-rotate(130deg) saturate(1.5)`                |
+| **Deuteranopia**         | `hue-rotate(110deg) saturate(1.3)`                |
+| **Tritanopia**           | `hue-rotate(-150deg) saturate(1.2)`               |
+| **Achromatopsia**        | `grayscale(100%)`                                 |
+| **Cataracts**            | `blur(1px) sepia(0.5) brightness(1.1)`            |
+| **Glaucoma**             | CSS radial-gradient vignette overlay              |
 | **Diabetic retinopathy** | `contrast(1.1) brightness(0.9) hue-rotate(-5deg)` |
 
 > **Note**: These are approximations, not medical diagnostic tools. Real vision deficiencies vary per individual.
@@ -129,17 +129,17 @@ vision-deficiency-simulator/
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start dev server with Turbopack |
-| `npm run build` | Build core library + Next.js |
-| `npm start` | Start production server |
-| `npm test` | Run Vitest unit tests |
-| `npm run test:watch` | Run tests in watch mode |
-| `npm run test:e2e` | Run Playwright E2E tests |
-| `npm run lint` | Run ESLint |
-| `npm run format` | Format code with Prettier |
-| `npm run coverage` | Run tests with coverage report |
+| Command              | Description                     |
+| -------------------- | ------------------------------- |
+| `npm run dev`        | Start dev server with Turbopack |
+| `npm run build`      | Build core library + Next.js    |
+| `npm start`          | Start production server         |
+| `npm test`           | Run Vitest unit tests           |
+| `npm run test:watch` | Run tests in watch mode         |
+| `npm run test:e2e`   | Run Playwright E2E tests        |
+| `npm run lint`       | Run ESLint                      |
+| `npm run format`     | Format code with Prettier       |
+| `npm run coverage`   | Run tests with coverage report  |
 
 ## Deployment
 

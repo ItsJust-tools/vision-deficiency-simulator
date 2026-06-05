@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
 import type { VisionCondition } from "@/tool/types";
 import { visionFilters } from "@/tool/types";
 
@@ -100,9 +99,7 @@ function ConditionSelector({
       <select
         id="condition-select"
         value={activeCondition}
-        onChange={(e) =>
-          onConditionChange?.(e.target.value as VisionCondition)
-        }
+        onChange={(e) => onConditionChange?.(e.target.value as VisionCondition)}
         style={{
           padding: "0.375rem 0.5rem",
           border: "1px solid var(--border)",
