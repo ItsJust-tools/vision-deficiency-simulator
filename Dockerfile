@@ -1,38 +1,24 @@
-# Vision Deficiency Simulator Dockerfile
-# Build: docker build -t vision-deficiency-simulator .
-# Run: docker run -p 3000:3000 vision-deficiency-simulator
-
-FROM node:22-alpine AS builder
-
+FROM node:22-alpine AS base
 WORKDIR /app
 
-# Copy package files
-COPY package.json pnpm-lock.json* ./
-
-# Install dependencies
+FROM base AS deps
+COPY package.json package-lock.json ./
+COPY packages/core/package.json ./packages/core/package.json
 RUN npm ci
 
-# Copy source code
+FROM base AS builder
+ENV NODE_ENV=production
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Build
 RUN npm run build
 
-# Production stage
 FROM node:22-alpine AS runner
-
 WORKDIR /app
-
-# Copy built app
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
-
-# Set env vars
 ENV NODE_ENV=production
-
-# Expose port
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 EXPOSE 3000
-
-# Start
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
