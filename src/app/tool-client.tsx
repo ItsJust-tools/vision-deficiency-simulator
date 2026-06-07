@@ -35,7 +35,7 @@ export default function ToolClient() {
   return (
     <>
       <ToolToolbar
-        onExport={() => handleExport("json")}
+        onExport={() => handleExport("png")}
         imageSrc={state.data.imageSrc}
         activeCondition={state.data.activeCondition}
         intensity={state.data.intensity}

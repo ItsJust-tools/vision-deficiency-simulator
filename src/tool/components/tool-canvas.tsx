@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import { visionFilters, type VisionCondition } from "@/tool/types";
 
@@ -21,8 +21,10 @@ export function ToolCanvas({
 }: ToolCanvasProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
+  const [isDragOver, setIsDragOver] = useState(false);
+
   // Derived from imageSrc — no separate state needed
-  const fileName = imageSrc ? "uploaded-image" : "No image uploaded";
+  const fileName = imageSrc ? "Image loaded" : "No image uploaded";
 
   const activeFilter = visionFilters.find(
     (f) => f.name === activeCondition,
@@ -53,12 +55,20 @@ export function ToolCanvas({
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
   }, []);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
+      setIsDragOver(false);
 
       const file = e.dataTransfer.files[0];
       if (file && file.type.startsWith("image/")) {
@@ -85,8 +95,26 @@ export function ToolCanvas({
       <div className="vision-header">
         {!imageSrc ? (
           <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "1rem",
+              minHeight: "16rem",
+              padding: "3rem 2rem",
+              borderRadius: "var(--radius)",
+              border: isDragOver
+                ? "2px dashed var(--accent)"
+                : "2px dashed var(--border)",
+              background: isDragOver
+                ? "var(--accent-subtle)"
+                : "var(--card)",
+              transition: "all 0.15s ease",
+            }}
             className="upload-mode"
             onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
             <div className="upload-instruction">
