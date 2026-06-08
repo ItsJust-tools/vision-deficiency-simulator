@@ -34,6 +34,26 @@ const toolConfig = {
           label: "Export",
           description: "export results as JSON",
         },
+        {
+          keys: "Ctrl+Shift+Left",
+          label: "Previous condition",
+          description: "cycle to the previous vision condition",
+        },
+        {
+          keys: "Ctrl+Shift+Right",
+          label: "Next condition",
+          description: "cycle to the next vision condition",
+        },
+        {
+          keys: "Ctrl+Shift+Up",
+          label: "Increase intensity",
+          description: "increase simulation intensity by 10%",
+        },
+        {
+          keys: "Ctrl+Shift+Down",
+          label: "Decrease intensity",
+          description: "decrease simulation intensity by 10%",
+        },
       ],
     },
   ],

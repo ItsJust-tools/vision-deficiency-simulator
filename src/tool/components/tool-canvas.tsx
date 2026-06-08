@@ -216,3 +216,5 @@ export function ToolCanvas({
     </div>
   );
 }
+
+ToolCanvas.displayName = "ToolCanvas";

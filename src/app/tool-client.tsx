@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { VisionCondition } from "@/tool/types";
 import { visionTool, ToolCanvas, ToolToolbar, ToolSidebar } from "@/tool";
+import { visionFilters } from "@/tool/types";
 import { useToolState, useExport, useShare } from "@itsjust/core";
 
 export default function ToolClient() {
@@ -31,6 +32,72 @@ export default function ToolClient() {
     },
     [exportTo],
   );
+
+  const activeCondition = state.data.activeCondition;
+
+  /**
+   * Register keyboard shortcuts:
+   *   Ctrl+Shift+Left/Right → cycle vision conditions
+   *   Ctrl+Shift+Up/Down    → adjust intensity by 10%
+   *   Ctrl+Shift+E          → export
+   */
+  useEffect(() => {
+    function handleKeyboard(e: KeyboardEvent) {
+      if (!(e.ctrlKey || e.metaKey) || !e.shiftKey) return;
+
+      switch (e.key.toLowerCase()) {
+        case "arrowleft": {
+          e.preventDefault();
+          const idx = visionFilters.findIndex(
+            (f) => f.name === activeCondition,
+          );
+          const prevIdx = (idx - 1 + visionFilters.length) % visionFilters.length;
+          state.setData((prev) => ({
+            ...prev,
+            activeCondition: visionFilters[prevIdx]!.name,
+          }));
+          break;
+        }
+        case "arrowright": {
+          e.preventDefault();
+          const idx = visionFilters.findIndex(
+            (f) => f.name === activeCondition,
+          );
+          const nextIdx = (idx + 1) % visionFilters.length;
+          state.setData((prev) => ({
+            ...prev,
+            activeCondition: visionFilters[nextIdx]!.name,
+          }));
+          break;
+        }
+        case "arrowup": {
+          e.preventDefault();
+          state.setData((prev) => ({
+            ...prev,
+            intensity: Math.min(100, prev.intensity + 10),
+          }));
+          break;
+        }
+        case "arrowdown": {
+          e.preventDefault();
+          state.setData((prev) => ({
+            ...prev,
+            intensity: Math.max(0, prev.intensity - 10),
+          }));
+          break;
+        }
+        case "e": {
+          e.preventDefault();
+          handleExport("json");
+          break;
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyboard);
+    return () => window.removeEventListener("keydown", handleKeyboard);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- state.setData is stable, only activeCondition matters for arrow key lookup
+  }, [activeCondition, handleExport, state.setData]);
 
   return (
     <>
