@@ -63,25 +63,22 @@ function buildPdf(imageBase64: string): Uint8Array {
   const encoder = new TextEncoder();
   const rawImageData = atob(imageBase64);
   const imageLen = rawImageData.length;
-
   const now = new Date().toISOString().slice(0, 10);
 
   // --- Object content definitions ---
-
-  // Object 6 first so the content stream in obj 4 can reference "6 0 R"
-  const obj6 = `6 0 obj
+  const fontObj = `6 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj`;
 
-  const obj1 = `1 0 obj
+  const catalogObj = `1 0 obj
 << /Type /Catalog /Pages 2 0 R >>
 endobj`;
 
-  const obj2 = `2 0 obj
+  const pagesObj = `2 0 obj
 << /Type /Pages /Kids [3 0 R] /Count 1 >>
 endobj`;
 
-  const obj3 = `3 0 obj
+  const pageObj = `3 0 obj
 << /Type /Page /Parent 2 0 R
    /MediaBox [0 0 595.28 841.89]
    /Contents 4 0 R
@@ -96,16 +93,16 @@ endobj`;
 
   const contentStreamLen = encoder.encode(contentStreamText).length;
 
-  const obj4 = `4 0 obj
+  const contentObj = `4 0 obj
 << /Length ${contentStreamLen} >>
 stream
 ${contentStreamText}
 endstream
 endobj`;
 
-  // Image object — note: PNG is wrapped as a raw stream; FlateDecode is
-  // omitted since PNG itself is already compressed.
-  const obj5Header = `5 0 obj
+  // Image object — PNG is wrapped as a raw stream; FlateDecode is omitted
+  // since PNG itself is already compressed.
+  const imageObjHeader = `5 0 obj
 << /Type /XObject
    /Subtype /Image
    /Width 1200
@@ -117,63 +114,23 @@ endobj`;
 stream
 `;
 
-  const obj5Footer = `\nendstream\nendobj`;
+  const imageObjFooter = `\nendstream\nendobj`;
 
-  // --- Combine into full PDF ---
-  const header = encoder.encode("%PDF-1.4\n%\xFF\xFF\xFF\xFF\n");
-  const parts = [obj1, obj2, obj3, obj4, obj5Header];
-  const partBytes = parts.map((p) => encoder.encode(p + "\n"));
-  const imageBytes = encoder.encode(rawImageData);
-  const footerBytes = encoder.encode(obj5Footer + "\n" + obj6 + "\n");
-
-  // Calculate byte offsets for xref
-  const offsets: number[] = [];
-  let cursor = header.length;
-
-  offsets.push(0); // obj 0 (free)
-  for (let i = 0; i < partBytes.length; i++) {
-    offsets.push(cursor);
-    cursor += partBytes[i].length;
-  }
-  // obj 5 includes header + image + footer
-  offsets.push(cursor);
-  cursor += imageBytes.length + footerBytes.length;
-  // obj 6 was appended in footer
-  // No — let me restructure: append obj6 separately
-
-  // Actually let me rebuild with proper structure
-  return buildPdfProper(
-    header,
-    [obj1, obj2, obj3, obj4],
-    obj5Header,
-    rawImageData,
-    obj5Footer,
-    obj6,
-    encoder,
-  );
-}
-
-function buildPdfProper(
-  header: Uint8Array,
-  textObjects: string[],
-  imageHeader: string,
-  rawImageData: string,
-  imageFooter: string,
-  fontObject: string,
-  encoder: TextEncoder,
-): Uint8Array {
-  // Byte layout:
+  // --- Build byte layout ---
   // 1. header
-  // 2. obj1 + \n
-  // 3. obj2 + \n
-  // 4. obj3 + \n
-  // 5. obj4 + \n
-  // 6. imageHeader + rawImageData + imageFooter + \n
-  // 7. fontObject + \n
+  // 2. catalog (obj 1)
+  // 3. pages (obj 2)
+  // 4. page (obj 3)
+  // 5. content stream (obj 4)
+  // 6. image object: header + raw data + footer (obj 5)
+  // 7. font object (obj 6)
   // 8. xref + trailer
 
+  const header = encoder.encode("%PDF-1.4\n%\xFF\xFF\xFF\xFF\n");
+  const textObjects = [catalogObj, pagesObj, pageObj, contentObj];
+
   const chunks: Uint8Array[] = [header];
-  const offsets: number[] = [0]; // obj 0 free
+  const offsets: number[] = [0]; // obj 0 (free entry)
   let cursor = header.length;
 
   for (const obj of textObjects) {
@@ -183,17 +140,17 @@ function buildPdfProper(
     cursor += bytes.length;
   }
 
-  // Image object
+  // Image object (obj 5)
   offsets.push(cursor);
-  const imgHeaderBytes = encoder.encode(imageHeader);
+  const imgHeaderBytes = encoder.encode(imageObjHeader);
   const imgDataBytes = encoder.encode(rawImageData);
-  const imgFooterBytes = encoder.encode(imageFooter);
+  const imgFooterBytes = encoder.encode(imageObjFooter);
   chunks.push(imgHeaderBytes, imgDataBytes, imgFooterBytes);
   cursor += imgHeaderBytes.length + imgDataBytes.length + imgFooterBytes.length;
 
-  // Font object
+  // Font object (obj 6)
   offsets.push(cursor);
-  const fontBytes = encoder.encode(fontObject + "\n");
+  const fontBytes = encoder.encode(fontObj + "\n");
   chunks.push(fontBytes);
   cursor += fontBytes.length;
 
