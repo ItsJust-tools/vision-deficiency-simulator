@@ -54,6 +54,11 @@ const toolConfig = {
           label: "Decrease intensity",
           description: "decrease simulation intensity by 10%",
         },
+        {
+          keys: "Ctrl+Shift+O",
+          label: "Toggle original",
+          description: "toggle between simulated and original view",
+        },
       ],
     },
   ],

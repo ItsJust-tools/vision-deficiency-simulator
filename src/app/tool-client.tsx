@@ -33,6 +33,38 @@ export default function ToolClient() {
     [exportTo],
   );
 
+  const handleUpload = useCallback(
+    (imageSrc: string) => {
+      state.setData((prev) => ({ ...prev, imageSrc, showOriginal: false }));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
+    [state.setData],
+  );
+
+  const handleReset = useCallback(() => {
+    state.setData((prev) => ({
+      ...prev,
+      imageSrc: "",
+      activeCondition: "normal",
+      intensity: 50,
+      showOriginal: false,
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
+  }, [state.setData]);
+
+  const handleConditionChange = useCallback(
+    (condition: VisionCondition) => {
+      state.setData((prev) => ({ ...prev, activeCondition: condition, showOriginal: false }));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
+    [state.setData],
+  );
+
+  const handleToggleOriginal = useCallback(() => {
+    state.setData((prev) => ({ ...prev, showOriginal: !prev.showOriginal }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
+  }, [state.setData]);
+
   const activeCondition = state.data.activeCondition;
 
   /**
@@ -91,12 +123,18 @@ export default function ToolClient() {
           handleExport("json");
           break;
         }
+        case "o": {
+          // Toggle original/comparison view
+          e.preventDefault();
+          state.setData((prev) => ({ ...prev, showOriginal: !prev.showOriginal }));
+          break;
+        }
       }
     }
 
     window.addEventListener("keydown", handleKeyboard);
     return () => window.removeEventListener("keydown", handleKeyboard);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- state.setData is stable, only activeCondition matters for arrow key lookup
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable, only activeCondition matters for arrow key lookup
   }, [activeCondition, handleExport, state.setData]);
 
   return (
@@ -106,21 +144,21 @@ export default function ToolClient() {
         imageSrc={state.data.imageSrc}
         activeCondition={state.data.activeCondition}
         intensity={state.data.intensity}
-        onConditionChange={(condition: VisionCondition) =>
-          state.setData((prev) => ({ ...prev, activeCondition: condition }))
-        }
+        showOriginal={state.data.showOriginal}
+        onConditionChange={handleConditionChange}
         onIntensityChange={(value) =>
           state.setData((prev) => ({ ...prev, intensity: value }))
         }
+        onReset={handleReset}
+        onToggleOriginal={handleToggleOriginal}
       />
       <ToolCanvas
         imageSrc={state.data.imageSrc}
         activeCondition={state.data.activeCondition}
         intensity={state.data.intensity}
+        showOriginal={state.data.showOriginal}
         canvasRef={canvasRef}
-        onUpload={(imageSrc) =>
-          state.setData((prev) => ({ ...prev, imageSrc }))
-        }
+        onUpload={handleUpload}
       />
       <ToolSidebar
         imageSrc={state.data.imageSrc}

@@ -28,6 +28,7 @@ export interface VisionState {
   imageSrc?: string; // Data URL from upload
   activeCondition: VisionCondition;
   intensity: number; // 0-100
+  showOriginal: boolean; // toggle to show unfiltered image
   results: SimulationResult[];
   notes: string;
 }

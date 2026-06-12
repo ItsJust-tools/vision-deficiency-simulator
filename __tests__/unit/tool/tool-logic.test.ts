@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { visionTool } from '@/tool/tool-definition';
-import type { VisionState, VisionCondition, SimulationResult } from '@/tool/types';
+import type { VisionState, VisionCondition } from '@/tool/types';
 
 describe('Vision tool definition', () => {
   const defaultState: VisionState = visionTool.initialState;
@@ -35,6 +35,7 @@ describe('Vision tool definition', () => {
       imageSrc: 'data:image/png;base64,fake',
       activeCondition: 'deuteranopia',
       intensity: 80,
+      showOriginal: false,
       results: [
         {
           condition: 'deuteranopia',
@@ -59,12 +60,14 @@ describe('Vision tool definition', () => {
       imageSrc: 'data:image/png;base64,fake123',
       activeCondition: 'achromatopsia',
       intensity: 100,
+      showOriginal: false,
       results: [
         {
           condition: 'achromatopsia',
           description: 'Complete color blindness',
           cssFilter: 'grayscale(100%)',
           intensity: 100,
+      showOriginal: false,
         },
       ],
       notes: 'Test simulation',
@@ -85,6 +88,7 @@ describe('Vision tool definition', () => {
       uploadMode: true,
       activeCondition: 'normal',
       intensity: 50,
+      showOriginal: false,
     });
     expect(result.success).toBe(true);
     if (result.success) {
@@ -111,6 +115,7 @@ describe('Vision tool definition', () => {
         uploadMode: true,
         activeCondition: condition,
         intensity: 50,
+      showOriginal: false,
       });
       expect(result.success).toBe(true);
       if (result.success) {
@@ -138,6 +143,7 @@ describe('Vision tool definition', () => {
     const result = visionTool.deserialize({
       activeCondition: 'normal',
       intensity: 50,
+      showOriginal: false,
     });
     expect(result.success).toBe(false);
   });
@@ -147,6 +153,7 @@ describe('Vision tool definition', () => {
       uploadMode: 'yes',
       activeCondition: 'normal',
       intensity: 50,
+      showOriginal: false,
     });
     expect(result.success).toBe(false);
   });
@@ -155,6 +162,7 @@ describe('Vision tool definition', () => {
     const result = visionTool.deserialize({
       uploadMode: true,
       intensity: 50,
+      showOriginal: false,
     });
     expect(result.success).toBe(false);
   });
@@ -181,6 +189,7 @@ describe('Vision tool definition', () => {
       uploadMode: true,
       activeCondition: 'unknown-condition',
       intensity: 50,
+      showOriginal: false,
     });
     expect(result.success).toBe(true);
   });

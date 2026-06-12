@@ -57,9 +57,10 @@ npm test
 1. **Upload an image** — drag-and-drop a screenshot/design onto the canvas, or click "Browse files"
 2. **Select a condition** — choose from the dropdown in the toolbar
 3. **Adjust intensity** — use the slider (0–100%) to control simulation strength
-4. **Compare results** — toggle between conditions to see the difference
+4. **Compare results** — click the "Compare" button or press Ctrl+Shift+O to toggle between original and simulated views
 5. **Export** — download the simulation as a PNG/WebP image or PDF report
-6. **Share** — export or share simulation state via `.itsjust.json`
+6. **Start over** — click "New image" to upload a different image
+7. **Share** — export or share simulation state via `.itsjust.json`
 
 ## Environment Variables
 

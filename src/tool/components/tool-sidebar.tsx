@@ -260,6 +260,21 @@ export function ToolSidebar({
                 color: "var(--foreground)",
               }}
             >
+              Ctrl+Shift+O
+            </kbd>
+            {" "}Toggle original view
+          </div>
+          <div>
+            <kbd
+              style={{
+                background: "var(--muted-bg)",
+                padding: "0.0625rem 0.375rem",
+                borderRadius: "0.25rem",
+                fontFamily: "ui-monospace, monospace",
+                fontSize: "0.625rem",
+                color: "var(--foreground)",
+              }}
+            >
               Ctrl+Shift+E
             </kbd>
             {" "}Export results

@@ -22,6 +22,7 @@ describe("Vision Deficiency Simulator Tool", () => {
         imageSrc: "",
         activeCondition: "normal",
         intensity: 50,
+      showOriginal: false,
         results: [],
         notes: "",
       };
@@ -40,6 +41,7 @@ describe("Vision Deficiency Simulator Tool", () => {
         imageSrc: "data:image/png;base64,...",
         activeCondition: "protanopia",
         intensity: 75,
+      showOriginal: false,
         results: [
           {
             condition: "protanopia",

@@ -78,6 +78,7 @@ describe('app and seo', () => {
         uploadMode: true,
         activeCondition: 'normal',
         intensity: 50,
+      showOriginal: false,
       })
     ).toEqual({
       success: true,
@@ -86,6 +87,7 @@ describe('app and seo', () => {
         imageSrc: '',
         activeCondition: 'normal',
         intensity: 50,
+      showOriginal: false,
         results: [],
         notes: '',
       },
@@ -101,6 +103,7 @@ describe('app and seo', () => {
         imageSrc: '',
         activeCondition: 'normal',
         intensity: 50,
+      showOriginal: false,
         results: [],
         notes: '',
       })

@@ -10,8 +10,11 @@ interface ToolToolbarProps {
   imageSrc?: string;
   activeCondition: VisionCondition;
   intensity: number;
+  showOriginal: boolean;
   onConditionChange?: (condition: VisionCondition) => void;
   onIntensityChange?: (value: number) => void;
+  onReset?: () => void;
+  onToggleOriginal?: () => void;
 }
 
 export function ToolToolbar({
@@ -20,8 +23,11 @@ export function ToolToolbar({
   imageSrc,
   activeCondition,
   intensity,
+  showOriginal,
   onConditionChange,
   onIntensityChange,
+  onReset,
+  onToggleOriginal,
 }: ToolToolbarProps) {
   return (
     <nav
@@ -48,7 +54,12 @@ export function ToolToolbar({
             intensity={intensity}
             onIntensityChange={onIntensityChange}
           />
+          <CompareButton
+            showOriginal={showOriginal}
+            onToggle={onToggleOriginal}
+          />
           <ExportButton onExport={onExport} />
+          <ResetButton onReset={onReset} />
         </>
       )}
     </nav>
@@ -223,6 +234,74 @@ function ExportButton({ onExport }: { onExport?: () => void }) {
       }}
     >
       Download Image
+    </button>
+  );
+}
+
+function CompareButton({
+  showOriginal,
+  onToggle,
+}: {
+  showOriginal: boolean;
+  onToggle?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-label={showOriginal ? "Show simulated view" : "Show original image for comparison"}
+      aria-pressed={showOriginal}
+      title="Toggle original view (Ctrl+Shift+O)"
+      style={{
+        fontSize: "0.8125rem",
+        fontWeight: 500,
+        padding: "0.375rem 0.75rem",
+        border: showOriginal
+          ? "2px solid var(--accent)"
+          : "1px solid var(--border)",
+        borderRadius: "var(--radius)",
+        background: showOriginal ? "var(--accent-subtle)" : "var(--card)",
+        color: showOriginal ? "var(--accent)" : "var(--foreground)",
+        cursor: "pointer",
+        fontFamily: "inherit",
+        display: "flex",
+        alignItems: "center",
+        gap: "0.375rem",
+        transition: "all 0.15s ease",
+      }}
+    >
+      {showOriginal ? "🔍 Original" : "👁️ Compare"}
+    </button>
+  );
+}
+
+function ResetButton({ onReset }: { onReset?: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onReset}
+      aria-label="Upload a new image"
+      title="Upload a new image"
+      style={{
+        fontSize: "0.8125rem",
+        fontWeight: 500,
+        padding: "0.375rem 0.75rem",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--radius)",
+        background: "transparent",
+        color: "var(--muted)",
+        cursor: "pointer",
+        fontFamily: "inherit",
+        display: "flex",
+        alignItems: "center",
+        gap: "0.375rem",
+        opacity: 0.8,
+        transition: "opacity 0.15s",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+      onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.8")}
+    >
+      ✕ New image
     </button>
   );
 }

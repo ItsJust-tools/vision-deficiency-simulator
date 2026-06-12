@@ -8,6 +8,7 @@ interface ToolCanvasProps {
   imageSrc?: string;
   activeCondition: string;
   intensity: number;
+  showOriginal: boolean;
   canvasRef?: React.RefObject<HTMLDivElement | null>;
   onUpload?: (imageSrc: string) => void;
 }
@@ -16,6 +17,7 @@ export function ToolCanvas({
   imageSrc,
   activeCondition,
   intensity,
+  showOriginal,
   canvasRef,
   onUpload,
 }: ToolCanvasProps) {
@@ -116,9 +118,13 @@ export function ToolCanvas({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            aria-label="Upload image area. Drag and drop or click to browse files."
+            role="region"
           >
             <div className="upload-instruction">
-              <p>Drag & drop an image here, or</p>
+              <p style={{ textAlign: "center" }}>
+                Drop a screenshot or design here to test accessibility
+              </p>
               <input
                 type="file"
                 accept="image/*"
@@ -137,9 +143,24 @@ export function ToolCanvas({
                   fontWeight: 500,
                   display: "inline-block",
                 }}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    document.getElementById("file-upload")?.click();
+                  }
+                }}
               >
                 Browse files
               </label>
+            </div>
+            <div
+              style={{
+                fontSize: "0.75rem",
+                color: "var(--muted)",
+                textAlign: "center",
+              }}
+            >
+              Supported: PNG, JPEG, WebP, GIF
             </div>
           </div>
         ) : (
@@ -156,7 +177,7 @@ export function ToolCanvas({
             >
               <Image
                 src={imageSrc}
-                alt="Uploaded image"
+                alt={showOriginal ? "Original image (no filter)" : `Uploaded image shown with ${activeFilter.description} simulation at ${intensity}% intensity`}
                 width={1200}
                 height={800}
                 style={{
@@ -166,8 +187,8 @@ export function ToolCanvas({
                 }}
                 unoptimized
               />
-              {/* Vision Filter Overlay */}
-              {isGlaucoma ? (
+              {/* Vision Filter Overlay — hidden when viewing original */}
+              {!showOriginal && (isGlaucoma ? (
                 <>
                   <div
                     ref={overlayRef}
@@ -203,12 +224,17 @@ export function ToolCanvas({
                     opacity: intensity / 100,
                   }}
                 />
-              )}
+              ))}
             </div>
 
             {/* Info */}
-            <div className="image-info">
-              <span className="file-name">{fileName}</span>
+            <div className="image-info" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="file-name" style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
+                {fileName}
+              </span>
+              <span style={{ fontSize: "0.6875rem", color: showOriginal ? "var(--accent)" : "var(--muted)" }}>
+                {showOriginal ? "Original view (no filter)" : `${activeFilter.description} — ${intensity}%`}
+              </span>
             </div>
           </>
         )}
