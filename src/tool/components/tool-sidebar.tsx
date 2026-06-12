@@ -1,6 +1,10 @@
 "use client";
 
-import { visionFilters, conditionDescriptions, type VisionCondition } from "@/tool/types";
+import {
+  visionFilters,
+  conditionDescriptions,
+  type VisionCondition,
+} from "@/tool/types";
 
 interface ToolSidebarProps {
   imageSrc?: string;
@@ -66,7 +70,13 @@ export function ToolSidebar({
             }}
           >
             <span style={{ fontSize: "2rem" }}>👁️</span>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.125rem" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.125rem",
+              }}
+            >
               <span style={{ fontWeight: 600, fontSize: "0.8125rem" }}>
                 {activeFilter.description}
               </span>
@@ -201,8 +211,8 @@ export function ToolSidebar({
               }}
             >
               Ctrl+PgUp
-            </kbd>
-            {" "}Previous condition
+            </kbd>{" "}
+            Previous condition
           </div>
           <div>
             <kbd
@@ -216,8 +226,8 @@ export function ToolSidebar({
               }}
             >
               Ctrl+Shift+→
-            </kbd>
-            {" "}Next condition
+            </kbd>{" "}
+            Next condition
           </div>
           <div>
             <kbd
@@ -231,8 +241,8 @@ export function ToolSidebar({
               }}
             >
               Ctrl+Shift+↑
-            </kbd>
-            {" "}Increase intensity
+            </kbd>{" "}
+            Increase intensity
           </div>
           <div>
             <kbd
@@ -246,8 +256,8 @@ export function ToolSidebar({
               }}
             >
               Ctrl+Shift+↓
-            </kbd>
-            {" "}Decrease intensity
+            </kbd>{" "}
+            Decrease intensity
           </div>
           <div>
             <kbd
@@ -261,8 +271,8 @@ export function ToolSidebar({
               }}
             >
               Ctrl+Shift+O
-            </kbd>
-            {" "}Toggle original view
+            </kbd>{" "}
+            Toggle original view
           </div>
           <div>
             <kbd
@@ -276,8 +286,8 @@ export function ToolSidebar({
               }}
             >
               Ctrl+Shift+E
-            </kbd>
-            {" "}Export results
+            </kbd>{" "}
+            Export results
           </div>
         </div>
       </div>

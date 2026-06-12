@@ -54,7 +54,11 @@ export default function ToolClient() {
 
   const handleConditionChange = useCallback(
     (condition: VisionCondition) => {
-      state.setData((prev) => ({ ...prev, activeCondition: condition, showOriginal: false }));
+      state.setData((prev) => ({
+        ...prev,
+        activeCondition: condition,
+        showOriginal: false,
+      }));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
     [state.setData],
@@ -83,7 +87,8 @@ export default function ToolClient() {
           const idx = visionFilters.findIndex(
             (f) => f.name === activeCondition,
           );
-          const prevIdx = (idx - 1 + visionFilters.length) % visionFilters.length;
+          const prevIdx =
+            (idx - 1 + visionFilters.length) % visionFilters.length;
           state.setData((prev) => ({
             ...prev,
             activeCondition: visionFilters[prevIdx]!.name,
@@ -126,7 +131,10 @@ export default function ToolClient() {
         case "o": {
           // Toggle original/comparison view
           e.preventDefault();
-          state.setData((prev) => ({ ...prev, showOriginal: !prev.showOriginal }));
+          state.setData((prev) => ({
+            ...prev,
+            showOriginal: !prev.showOriginal,
+          }));
           break;
         }
       }
@@ -134,7 +142,7 @@ export default function ToolClient() {
 
     window.addEventListener("keydown", handleKeyboard);
     return () => window.removeEventListener("keydown", handleKeyboard);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable, only activeCondition matters for arrow key lookup
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable, only activeCondition matters for arrow key lookup
   }, [activeCondition, handleExport, state.setData]);
 
   return (
