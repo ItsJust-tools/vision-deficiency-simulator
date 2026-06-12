@@ -109,9 +109,7 @@ export function ToolCanvas({
               border: isDragOver
                 ? "2px dashed var(--accent)"
                 : "2px dashed var(--border)",
-              background: isDragOver
-                ? "var(--accent-subtle)"
-                : "var(--card)",
+              background: isDragOver ? "var(--accent-subtle)" : "var(--card)",
               transition: "all 0.15s ease",
             }}
             className="upload-mode"
@@ -177,7 +175,11 @@ export function ToolCanvas({
             >
               <Image
                 src={imageSrc}
-                alt={showOriginal ? "Original image (no filter)" : `Uploaded image shown with ${activeFilter.description} simulation at ${intensity}% intensity`}
+                alt={
+                  showOriginal
+                    ? "Original image (no filter)"
+                    : `Uploaded image shown with ${activeFilter.description} simulation at ${intensity}% intensity`
+                }
                 width={1200}
                 height={800}
                 style={{
@@ -188,8 +190,32 @@ export function ToolCanvas({
                 unoptimized
               />
               {/* Vision Filter Overlay — hidden when viewing original */}
-              {!showOriginal && (isGlaucoma ? (
-                <>
+              {!showOriginal &&
+                (isGlaucoma ? (
+                  <>
+                    <div
+                      ref={overlayRef}
+                      className="vision-overlay"
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        pointerEvents: "none",
+                        filter: activeFilter.cssFilter,
+                        opacity: intensity / 100,
+                      }}
+                    />
+                    <div
+                      className="glaucoma-overlay"
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        pointerEvents: "none",
+                        background: `radial-gradient(circle at center, transparent ${100 - intensity}%, rgba(0,0,0,0.85) 100%)`,
+                        opacity: intensity / 100,
+                      }}
+                    />
+                  </>
+                ) : (
                   <div
                     ref={overlayRef}
                     className="vision-overlay"
@@ -201,39 +227,33 @@ export function ToolCanvas({
                       opacity: intensity / 100,
                     }}
                   />
-                  <div
-                    className="glaucoma-overlay"
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      pointerEvents: "none",
-                      background: `radial-gradient(circle at center, transparent ${100 - intensity}%, rgba(0,0,0,0.85) 100%)`,
-                      opacity: intensity / 100,
-                    }}
-                  />
-                </>
-              ) : (
-                <div
-                  ref={overlayRef}
-                  className="vision-overlay"
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    pointerEvents: "none",
-                    filter: activeFilter.cssFilter,
-                    opacity: intensity / 100,
-                  }}
-                />
-              ))}
+                ))}
             </div>
 
             {/* Info */}
-            <div className="image-info" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span className="file-name" style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
+            <div
+              className="image-info"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <span
+                className="file-name"
+                style={{ fontSize: "0.75rem", color: "var(--muted)" }}
+              >
                 {fileName}
               </span>
-              <span style={{ fontSize: "0.6875rem", color: showOriginal ? "var(--accent)" : "var(--muted)" }}>
-                {showOriginal ? "Original view (no filter)" : `${activeFilter.description} — ${intensity}%`}
+              <span
+                style={{
+                  fontSize: "0.6875rem",
+                  color: showOriginal ? "var(--accent)" : "var(--muted)",
+                }}
+              >
+                {showOriginal
+                  ? "Original view (no filter)"
+                  : `${activeFilter.description} — ${intensity}%`}
               </span>
             </div>
           </>

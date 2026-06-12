@@ -249,7 +249,11 @@ function CompareButton({
     <button
       type="button"
       onClick={onToggle}
-      aria-label={showOriginal ? "Show simulated view" : "Show original image for comparison"}
+      aria-label={
+        showOriginal
+          ? "Show simulated view"
+          : "Show original image for comparison"
+      }
       aria-pressed={showOriginal}
       title="Toggle original view (Ctrl+Shift+O)"
       style={{

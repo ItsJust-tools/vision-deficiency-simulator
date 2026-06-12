@@ -1,6 +1,5 @@
 import * as react from 'react';
 import { ComponentType, ReactNode, RefObject, Component, ErrorInfo } from 'react';
-import * as react_jsx_runtime from 'react/jsx-runtime';
 
 interface ToolTheme {
     accent?: string;
@@ -39,7 +38,7 @@ interface FeatureFlags {
     darkMode: boolean;
 }
 declare const defaultFeatures: FeatureFlags;
-type ExportFormat = 'png' | 'pdf' | 'json' | 'jpeg' | 'webp';
+type ExportFormat = "png" | "pdf" | "json" | "jpeg" | "webp";
 
 interface ExportOptions {
     format: ExportFormat;
@@ -48,7 +47,7 @@ interface ExportOptions {
     filename?: string;
     background?: string;
     padding?: number;
-    orientation?: 'portrait' | 'landscape' | 'auto';
+    orientation?: "portrait" | "landscape" | "auto";
     allowSensitiveData?: boolean;
     signal?: AbortSignal;
 }
@@ -95,7 +94,7 @@ interface StorageData<T> {
     data: T;
     savedAt: string;
     version: string;
-    encoding?: 'plain' | 'lz-string';
+    encoding?: "plain" | "lz-string";
 }
 interface AutoSaveOptions {
     enabled: boolean;
@@ -106,12 +105,12 @@ interface AutoSaveOptions {
     version?: string;
     storageManager?: {
         loadEntry: <T>(key: string, expectedVersion?: string) => {
-            status: 'missing' | 'ok' | 'corrupt';
+            status: "missing" | "ok" | "corrupt";
             data: T | null;
         };
         save: <T>(key: string, data: T, version?: string) => Promise<void>;
     };
-    historyStorage?: Pick<Storage, 'getItem' | 'setItem'>;
+    historyStorage?: Pick<Storage, "getItem" | "setItem">;
     historyNamespace?: string;
 }
 declare const defaultAutoSaveOptions: AutoSaveOptions;
@@ -138,7 +137,7 @@ interface ToolPlugin {
     /** Unique plugin identifier (e.g. 'sidebar-panel', 'toolbar-extra') */
     id: string;
     /** Where the plugin should be mounted in the shell */
-    slot: 'toolbar' | 'sidebar' | 'statusBar' | 'canvas';
+    slot: "toolbar" | "sidebar" | "statusBar" | "canvas";
     /** React component mounted by ToolShell */
     Component: ComponentType;
     /** Optional rendering order (lower first) */
@@ -209,7 +208,7 @@ declare class ExportEngine {
 }
 declare function createExportEngine(localLoaders?: Partial<Record<ExportFormat, ExporterLoader>>, maxExporterCacheSize?: number): ExportEngine;
 
-type StorageLoadStatus = 'missing' | 'ok' | 'corrupt';
+type StorageLoadStatus = "missing" | "ok" | "corrupt";
 interface StorageLoadResult<T> {
     status: StorageLoadStatus;
     data: T | null;
@@ -256,7 +255,7 @@ type ImportResult = {
     format?: ExportFormat;
     isItsJustFile?: boolean;
 };
-type ImportFormat = ExportFormat | 'itsjust';
+type ImportFormat = ExportFormat | "itsjust";
 interface UseImportOptions {
     /** Accepted file formats (default: json) */
     acceptedFormats?: ImportFormat[];
@@ -337,7 +336,7 @@ interface ToolShellProps {
  * Renders a toolbar, optional sidebar, main canvas, and status bar.
  * Handles mobile responsiveness, keyboard shortcuts, and dark mode.
  */
-declare function ToolShell({ config, readOnly, actions, sidebarOpen: controlledSidebarOpen, onSidebarChange, toolbar, sidebar, canvas, statusBar, slots, plugins, }: ToolShellProps): react_jsx_runtime.JSX.Element;
+declare function ToolShell({ config, readOnly, actions, sidebarOpen: controlledSidebarOpen, onSidebarChange, toolbar, sidebar, canvas, statusBar, slots, plugins, }: ToolShellProps): react.JSX.Element;
 declare namespace ToolShell {
     var displayName: string;
 }
@@ -363,7 +362,7 @@ interface UseToolResult<TState> {
     /** Formats this tool supports */
     supportedFormats: ExportFormat[];
     /** Show a toast notification */
-    toast: (message: string, type?: 'success' | 'error') => void;
+    toast: (message: string, type?: "success" | "error") => void;
 }
 /**
  * Unified hook that wires up state, export, import, share, undo/redo,
@@ -452,7 +451,7 @@ interface UseUrlStateOptions {
     /** Called when state is successfully loaded from the URL on mount. */
     onStateLoaded: (data: unknown) => void;
     /** Show a toast notification. */
-    showToast: (message: string, type: 'success' | 'error') => void;
+    showToast: (message: string, type: "success" | "error") => void;
 }
 interface UseUrlStateReturn {
     /** Create a share URL, copy to clipboard (or use Web Share API), and update the address bar. */
@@ -490,20 +489,20 @@ declare function useKeyboardShortcuts(actions: ToolbarActions, onShowShortcuts: 
  */
 declare function usePlugins(plugins: ToolPlugin[], features: FeatureFlags): Record<"toolbar" | "sidebar" | "statusBar" | "canvas", ToolPlugin[]>;
 
-type Theme = 'light' | 'dark' | 'system';
-type ContrastMode = 'normal' | 'more' | 'system';
+type Theme = "light" | "dark" | "system";
+type ContrastMode = "normal" | "more" | "system";
 interface ThemeContextValue {
     theme: Theme;
     setTheme: (theme: Theme) => void;
     contrast: ContrastMode;
     setContrast: (contrast: ContrastMode) => void;
-    resolvedTheme: 'light' | 'dark';
-    resolvedContrast: 'normal' | 'more';
+    resolvedTheme: "light" | "dark";
+    resolvedContrast: "normal" | "more";
 }
 declare function ThemeProvider({ children, toolTheme, }: {
     children: React.ReactNode;
     toolTheme?: ToolTheme;
-}): react_jsx_runtime.JSX.Element;
+}): react.JSX.Element;
 declare namespace ThemeProvider {
     var displayName: string;
 }
@@ -511,21 +510,21 @@ declare function useTheme(): ThemeContextValue;
 
 declare function ThemeScript({ toolTheme }: {
     toolTheme?: ToolTheme;
-}): react_jsx_runtime.JSX.Element;
+}): react.JSX.Element;
 
 interface Toast {
     id: number;
     message: string;
-    type: 'success' | 'error' | 'info';
+    type: "success" | "error" | "info";
     exiting?: boolean;
 }
 interface ToastContextValue {
-    toast: (message: string, type?: Toast['type']) => void;
+    toast: (message: string, type?: Toast["type"]) => void;
 }
 declare function useToast(): ToastContextValue;
 declare function ToastProvider({ children }: {
     children: ReactNode;
-}): react_jsx_runtime.JSX.Element;
+}): react.JSX.Element;
 declare namespace ToastProvider {
     var displayName: string;
 }
@@ -534,7 +533,7 @@ interface KeyboardShortcutsOverlayProps {
     groups: ShortcutGroup[];
     onClose: () => void;
 }
-declare function KeyboardShortcutsOverlay({ groups, onClose }: KeyboardShortcutsOverlayProps): react_jsx_runtime.JSX.Element;
+declare function KeyboardShortcutsOverlay({ groups, onClose, }: KeyboardShortcutsOverlayProps): react.JSX.Element;
 declare namespace KeyboardShortcutsOverlay {
     var displayName: string;
 }
@@ -555,7 +554,7 @@ interface ImportExportProps {
     /** Currently creating a share URL */
     isSharing?: boolean;
 }
-declare function ImportExport({ formats, onExport, onImport, isImporting, isExporting, onShare, isSharing, }: ImportExportProps): react_jsx_runtime.JSX.Element;
+declare function ImportExport({ formats, onExport, onImport, isImporting, isExporting, onShare, isSharing, }: ImportExportProps): react.JSX.Element;
 declare namespace ImportExport {
     var displayName: string;
 }
@@ -571,7 +570,7 @@ declare class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryS
     constructor(props: ErrorBoundaryProps);
     static getDerivedStateFromError(): ErrorBoundaryState;
     componentDidCatch(error: Error, info: ErrorInfo): void;
-    render(): string | number | bigint | boolean | Iterable<ReactNode> | Promise<string | number | bigint | boolean | react.ReactPortal | react.ReactElement<unknown, string | react.JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | react_jsx_runtime.JSX.Element | null | undefined;
+    render(): string | number | bigint | boolean | Iterable<ReactNode> | Promise<string | number | bigint | boolean | react.ReactPortal | react.ReactElement<unknown, string | react.JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | react.JSX.Element | null | undefined;
 }
 
 declare const strings: {
@@ -612,7 +611,7 @@ declare const strings: {
     };
 };
 type Locale = keyof typeof strings;
-type StringKey = keyof (typeof strings)['en'];
+type StringKey = keyof (typeof strings)["en"];
 /**
  * Retrieve a localized string. Falls back to English.
  * For parameterized strings, pass arguments after the key.
