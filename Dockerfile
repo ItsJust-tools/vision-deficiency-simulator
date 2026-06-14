@@ -8,6 +8,7 @@ RUN npm ci
 
 FROM base AS builder
 ENV NODE_ENV=production
+ENV BUILD_STANDALONE=true
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
