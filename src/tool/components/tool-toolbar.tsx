@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import type { VisionCondition } from "@/tool/types";
 import { visionFilters } from "@/tool/types";
+import { useFileUpload } from "@/tool/hooks/use-file-upload";
 
 interface ToolToolbarProps {
   onExport?: () => void;
@@ -67,25 +68,8 @@ export function ToolToolbar({
 }
 
 function UploadButton({ onUpload }: { onUpload?: (imageSrc: string) => void }) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          if (event.target?.result) {
-            onUpload?.(event.target.result as string);
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-      // Reset input so re-selecting the same file triggers onChange
-      e.target.value = "";
-    },
-    [onUpload],
-  );
+  const { fileInputRef, handleFileChange, openFileDialog } =
+    useFileUpload(onUpload);
 
   return (
     <>
@@ -105,7 +89,7 @@ function UploadButton({ onUpload }: { onUpload?: (imageSrc: string) => void }) {
         aria-label="Upload image to simulate vision deficiencies"
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
-            fileInputRef.current?.click();
+            openFileDialog();
           }
         }}
         style={{
@@ -143,7 +127,6 @@ function ConditionSelector({
         display: "flex",
         alignItems: "center",
         gap: "0.5rem",
-        margin: "0.5rem",
       }}
     >
       <label htmlFor="condition-select" style={{ fontSize: "0.75rem" }}>

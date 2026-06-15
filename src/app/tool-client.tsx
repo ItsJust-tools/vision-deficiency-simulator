@@ -173,59 +173,61 @@ export default function ToolClient() {
         activeCondition={state.data.activeCondition}
         intensity={state.data.intensity}
       />
-      {/* Share Actions - visible only when data is ready */}
-      <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
-        <button
-          type="button"
-          onClick={async () => {
-            await downloadShareFile({
-              toolId: toolConfig.id,
-              content: visionTool.serialize(state.data),
-              metadata: { schemaVersion: "1.0" },
-            });
-          }}
-          disabled={isExporting}
-          style={{
-            padding: "0.375rem 0.75rem",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius)",
-            background: "var(--card)",
-            color: "var(--foreground)",
-            cursor: isExporting ? "not-allowed" : "pointer",
-            fontSize: "0.8125rem",
-            fontWeight: 500,
-            fontFamily: "inherit",
-          }}
-          aria-disabled={isExporting}
-        >
-          Download .itsjust.json
-        </button>
-        <button
-          type="button"
-          onClick={async () => {
-            await shareViaWeb({
-              toolId: toolConfig.id,
-              content: visionTool.serialize(state.data),
-              metadata: { schemaVersion: "1.0" },
-            });
-          }}
-          disabled={isExporting}
-          style={{
-            padding: "0.375rem 0.75rem",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius)",
-            background: "var(--card)",
-            color: "var(--foreground)",
-            cursor: isExporting ? "not-allowed" : "pointer",
-            fontSize: "0.8125rem",
-            fontWeight: 500,
-            fontFamily: "inherit",
-          }}
-          aria-disabled={isExporting}
-        >
-          Share
-        </button>
-      </div>
+      {/* Share Actions - visible only when an image is loaded */}
+      {state.data.imageSrc && (
+        <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
+          <button
+            type="button"
+            onClick={async () => {
+              await downloadShareFile({
+                toolId: toolConfig.id,
+                content: visionTool.serialize(state.data),
+                metadata: { schemaVersion: "1.0" },
+              });
+            }}
+            disabled={isExporting}
+            style={{
+              padding: "0.375rem 0.75rem",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius)",
+              background: "var(--card)",
+              color: "var(--foreground)",
+              cursor: isExporting ? "not-allowed" : "pointer",
+              fontSize: "0.8125rem",
+              fontWeight: 500,
+              fontFamily: "inherit",
+            }}
+            aria-disabled={isExporting}
+          >
+            Download .itsjust.json
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              await shareViaWeb({
+                toolId: toolConfig.id,
+                content: visionTool.serialize(state.data),
+                metadata: { schemaVersion: "1.0" },
+              });
+            }}
+            disabled={isExporting}
+            style={{
+              padding: "0.375rem 0.75rem",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius)",
+              background: "var(--card)",
+              color: "var(--foreground)",
+              cursor: isExporting ? "not-allowed" : "pointer",
+              fontSize: "0.8125rem",
+              fontWeight: 500,
+              fontFamily: "inherit",
+            }}
+            aria-disabled={isExporting}
+          >
+            Share
+          </button>
+        </div>
+      )}
     </>
   );
 }

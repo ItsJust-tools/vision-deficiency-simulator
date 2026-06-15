@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import Image from "next/image";
 import { visionFilters, type VisionCondition } from "@/tool/types";
 
@@ -13,6 +13,19 @@ interface ToolCanvasProps {
   onUpload?: (imageSrc: string) => void;
 }
 
+/**
+ * Extract a display-friendly filename from a data URL or path.
+ * Falls back to "Image loaded" when the source is a data URL.
+ */
+function getDisplayFilename(imageSrc?: string): string {
+  if (!imageSrc) return "No image uploaded";
+  if (imageSrc.startsWith("data:")) return "Image loaded";
+  // Extract filename from path
+  const parts = imageSrc.split("/");
+  const last = parts[parts.length - 1] ?? "";
+  return last || "Image loaded";
+}
+
 export function ToolCanvas({
   imageSrc,
   activeCondition,
@@ -21,12 +34,9 @@ export function ToolCanvas({
   canvasRef,
   onUpload,
 }: ToolCanvasProps) {
-  const overlayRef = useRef<HTMLDivElement>(null);
-
   const [isDragOver, setIsDragOver] = useState(false);
 
-  // Derived from imageSrc — no separate state needed
-  const fileName = imageSrc ? "Image loaded" : "No image uploaded";
+  const fileName = getDisplayFilename(imageSrc);
 
   const activeFilter = visionFilters.find(
     (f) => f.name === activeCondition,
@@ -194,7 +204,6 @@ export function ToolCanvas({
                 (isGlaucoma ? (
                   <>
                     <div
-                      ref={overlayRef}
                       className="vision-overlay"
                       style={{
                         position: "absolute",
@@ -217,7 +226,6 @@ export function ToolCanvas({
                   </>
                 ) : (
                   <div
-                    ref={overlayRef}
                     className="vision-overlay"
                     style={{
                       position: "absolute",

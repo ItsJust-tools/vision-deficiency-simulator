@@ -118,9 +118,11 @@ describe("app client and help page", () => {
     expect(mockSetData).toHaveBeenCalled();
   });
 
-  it("renders share and download buttons", () => {
+  it("hides share and download buttons when no image is loaded", () => {
     render(<ToolClient />);
-    expect(screen.getByText("Download .itsjust.json")).toBeInTheDocument();
-    expect(screen.getByText("Share")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Download .itsjust.json"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Share")).not.toBeInTheDocument();
   });
 });

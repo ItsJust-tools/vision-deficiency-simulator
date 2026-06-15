@@ -9,7 +9,7 @@ const toolConfig = {
   description:
     "Simulate vision deficiencies for accessibility testing. See how your designs look to users with different visual conditions.",
   version: "1.0.0",
-  exportFormats: ["json", "png", "pdf"],
+  exportFormats: ["json", "png", "webp", "pdf"],
   features: {
     export: true,
     autoSave: false,
