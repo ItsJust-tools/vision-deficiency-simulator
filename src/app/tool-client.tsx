@@ -54,11 +54,28 @@ export default function ToolClient() {
 
   const handleConditionChange = useCallback(
     (condition: VisionCondition) => {
-      state.setData((prev) => ({
-        ...prev,
-        activeCondition: condition,
-        showOriginal: false,
-      }));
+      state.setData((prev) => {
+        const filter = visionFilters.find((f) => f.name === condition);
+        const newResult = filter
+          ? {
+              condition: filter.name,
+              description: filter.description,
+              cssFilter: filter.cssFilter,
+              intensity: prev.intensity,
+            }
+          : null;
+        return {
+          ...prev,
+          activeCondition: condition,
+          showOriginal: false,
+          results: newResult
+            ? [
+                ...prev.results.filter((r) => r.condition !== condition),
+                newResult,
+              ]
+            : prev.results,
+        };
+      });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
     [state.setData],

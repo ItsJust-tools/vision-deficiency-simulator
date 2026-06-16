@@ -71,6 +71,7 @@ describe("Vision Deficiency Simulator Tool", () => {
         imageSrc: "data:image/png;base64,...",
         activeCondition: "deuteranopia",
         intensity: 100,
+        showOriginal: false,
         results: [],
         notes: "",
       };

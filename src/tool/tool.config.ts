@@ -8,7 +8,7 @@ const toolConfig = {
   name: "Vision Deficiency Simulator",
   description:
     "Simulate vision deficiencies for accessibility testing. See how your designs look to users with different visual conditions.",
-  version: "1.0.0",
+  version: "1.1.0",
   exportFormats: ["json", "png", "webp", "pdf"],
   features: {
     export: true,

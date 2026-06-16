@@ -74,15 +74,15 @@ All simulations are applied client-side using CSS filter functions and overlay e
 
 | Condition                | Technique                                         |
 | ------------------------ | ------------------------------------------------- |
-| **Protanopia**           | `hue-rotate(130deg) saturate(1.5)`                |
-| **Deuteranopia**         | `hue-rotate(110deg) saturate(1.3)`                |
-| **Tritanopia**           | `hue-rotate(-150deg) saturate(1.2)`               |
-| **Achromatopsia**        | `grayscale(100%)`                                 |
+| **Protanopia**           | BVM color matrix (feColorMatrix)                  |
+| **Deuteranopia**         | BVM color matrix (feColorMatrix)                  |
+| **Tritanopia**           | BVM color matrix (feColorMatrix)                  |
+| **Achromatopsia**        | Luminance color matrix (feColorMatrix)            |
 | **Cataracts**            | `blur(1px) sepia(0.5) brightness(1.1)`            |
 | **Glaucoma**             | CSS radial-gradient vignette overlay              |
 | **Diabetic retinopathy** | `contrast(1.1) brightness(0.9) hue-rotate(-5deg)` |
 
-> **Note**: These are approximations, not medical diagnostic tools. Real vision deficiencies vary per individual.
+> **Note**: Color-blindness simulations (protanopia, deuteranopia, tritanopia, achromatopsia) use the Brettel-Vienot-Mollon (BVM) color matrix model via SVG `feColorMatrix` for significantly more accurate results than simple hue-rotate/saturate approximations. These are still approximations, not medical diagnostic tools. Real vision deficiencies vary per individual.
 
 ## Accessibility Features
 

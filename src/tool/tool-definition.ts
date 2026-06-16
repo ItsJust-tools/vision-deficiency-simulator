@@ -9,12 +9,14 @@ function isVisionState(value: unknown): value is VisionState {
     imageSrc?: unknown;
     activeCondition?: unknown;
     intensity?: unknown;
+    showOriginal?: unknown;
     results?: unknown;
     notes?: unknown;
   };
   if (typeof v.uploadMode !== "boolean") return false;
   if (typeof v.activeCondition !== "string") return false;
   if (typeof v.intensity !== "number") return false;
+  if (typeof v.showOriginal !== "boolean") return false;
   return true;
 }
 

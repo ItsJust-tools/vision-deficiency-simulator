@@ -17,7 +17,7 @@ describe("Vision tool definition", () => {
   it("has correct metadata", () => {
     expect(visionTool.id).toBe("vision-deficiency-simulator");
     expect(visionTool.name).toBe("Vision Deficiency Simulator");
-    expect(visionTool.version).toBe("1.0.0");
+    expect(visionTool.version).toBe("1.1.0");
   });
 
   it("serializes state to JSON string", () => {

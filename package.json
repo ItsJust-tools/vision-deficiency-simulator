@@ -1,6 +1,6 @@
 {
   "name": "vision-deficiency-simulator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A client-side WCAG accessibility tool for simulating vision deficiencies. Test how your designs, UI, and content appear to users with different visual conditions.",
   "license": "MIT",
   "private": true,
@@ -29,7 +29,9 @@
     "preflight": "node scripts/preflight.mjs"
   },
   "dependencies": {
+    "@itsjust/core": "*",
     "html-to-image": "^1.11.13",
+    "lz-string": "^1.5.0",
     "next": "^16.2.9",
     "react": "19.2.7",
     "react-dom": "19.2.7"

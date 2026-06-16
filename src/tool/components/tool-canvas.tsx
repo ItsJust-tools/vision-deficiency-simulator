@@ -2,7 +2,11 @@
 
 import { useCallback, useState } from "react";
 import Image from "next/image";
-import { visionFilters, type VisionCondition } from "@/tool/types";
+import {
+  visionFilters,
+  colorMatrices,
+  type VisionCondition,
+} from "@/tool/types";
 
 interface ToolCanvasProps {
   imageSrc?: string;
@@ -103,6 +107,22 @@ export function ToolCanvas({
       role="application"
       aria-label="Vision Deficiency Simulator"
     >
+      {/* SVG filter definitions for color-blindness simulation matrices */}
+      <svg
+        style={{ position: "absolute", width: 0, height: 0 }}
+        aria-hidden="true"
+      >
+        <defs>
+          {Object.entries(colorMatrices).map(([name, matrix]) => (
+            <filter key={name} id={`${name}-matrix`}>
+              <feColorMatrix
+                type="matrix"
+                values={matrix.map((row) => row.join(" ")).join(" ")}
+              />
+            </filter>
+          ))}
+        </defs>
+      </svg>
       {/* Upload/View Toggle */}
       <div className="vision-header">
         {!imageSrc ? (
