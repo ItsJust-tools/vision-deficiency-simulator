@@ -51,7 +51,7 @@
     "@types/react": "^19.2.16",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.1",
-    "@vitest/coverage-v8": "^4.1.8",
+    "@vitest/coverage-v8": "^4.1.10",
     "depcheck": "^1.4.7",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
@@ -61,9 +61,9 @@
     "tsup": "^8.5.1",
     "typescript": "^6",
     "vitest": "^4.1.8",
-    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.1",
+    "@testing-library/user-event": "^14.6.3",
     "lint-staged": "^17.0.7"
   },
   "optionalDependencies": {
