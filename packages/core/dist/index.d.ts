@@ -227,6 +227,35 @@ declare class StorageManager {
 declare const storageManager: StorageManager;
 
 /**
+ * Filename sanitization utilities.
+ *
+ * Generated export filenames (PNG, JSON, PDF, SVG, TXT, WebP, share files) may
+ * be derived from user-provided titles or uploaded file names. Such names can
+ * contain characters that are invalid or unsafe on different operating systems
+ * (`\`, `/`, `:`, `*`, `?`, `"`, `<`, `>`, `|`, control characters, or leading
+ * dots), which can cause silent download failures or corrupted file names on
+ * Windows and Linux filesystems.
+ *
+ * This module provides a single, strict sanitizer used across all export paths
+ * so filenames are always safe to write to disk.
+ */
+/** Maximum length (in code units) enforced for a sanitized filename. */
+declare const MAX_FILENAME_LENGTH = 100;
+/**
+ * Sanitize a filename so it is safe to use across Windows, macOS, and Linux.
+ *
+ * - Replaces invalid OS characters (`/ \ ? % * : | " < >`) with `-`.
+ * - Strips control characters.
+ * - Removes leading dots (hidden files) and leading/trailing whitespace.
+ * - Collapses whitespace runs.
+ * - Enforces a maximum length of {@link MAX_FILENAME_LENGTH} characters.
+ *
+ * @param filename - The raw filename to sanitize.
+ * @returns A safe filename, or a fallback when the input is empty/blank.
+ */
+declare function sanitizeFilename(filename: string, fallback?: string): string;
+
+/**
  * Hook that manages tool state with undo/redo, auto-save to localStorage,
  * and dirty-state tracking. Callers must treat state as immutable — never
  * mutate objects in-place or the dirty check will break.
@@ -618,4 +647,4 @@ type StringKey = keyof (typeof strings)["en"];
  */
 declare function t(key: StringKey, locale?: Locale, ...args: string[]): string;
 
-export { type AutoSaveOptions, ErrorBoundary, ExportEngine, type ExportFormat, type ExportOptions, type ExportResult, type Exporter, type ExporterLoader, type FeatureFlags, ImportExport, type ImportExportProps, type ImportResult, KeyboardShortcutsOverlay, type ShareData, type ShareResult, type ShortcutDef, type ShortcutGroup, type StorageData, StorageManager, ThemeProvider, ThemeScript, ToastProvider, type Tool, type ToolConfig, type ToolExporterDefinition, ToolShell, type ToolState, type ToolTheme, type ToolbarActions, type UseImportOptions, type UseToolResult, createExportEngine, defaultAutoSaveOptions, defaultFeatures, formatLabels, storageManager, t, useDragAndDropImport, useExport, useImport, useKeyboardShortcuts, usePlugins, useRelativeTime, useShare, useStorage, useTheme, useToast, useTool, useToolState, useUrlState };
+export { type AutoSaveOptions, ErrorBoundary, ExportEngine, type ExportFormat, type ExportOptions, type ExportResult, type Exporter, type ExporterLoader, type FeatureFlags, ImportExport, type ImportExportProps, type ImportResult, KeyboardShortcutsOverlay, MAX_FILENAME_LENGTH, type ShareData, type ShareResult, type ShortcutDef, type ShortcutGroup, type StorageData, StorageManager, ThemeProvider, ThemeScript, ToastProvider, type Tool, type ToolConfig, type ToolExporterDefinition, ToolShell, type ToolState, type ToolTheme, type ToolbarActions, type UseImportOptions, type UseToolResult, createExportEngine, defaultAutoSaveOptions, defaultFeatures, formatLabels, sanitizeFilename, storageManager, t, useDragAndDropImport, useExport, useImport, useKeyboardShortcuts, usePlugins, useRelativeTime, useShare, useStorage, useTheme, useToast, useTool, useToolState, useUrlState };

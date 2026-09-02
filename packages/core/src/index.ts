@@ -33,6 +33,13 @@ export { ExportEngine, createExportEngine } from "./engines/export-engine";
 /** Manager for namespaced, versioned localStorage persistence. */
 export { StorageManager, storageManager } from "./engines/storage-manager";
 
+// Utils
+/** Sanitize generated export filenames against invalid OS characters. */
+export {
+  sanitizeFilename,
+  MAX_FILENAME_LENGTH,
+} from "./utils/sanitize-filename";
+
 // Hooks
 /**
  * useToolState — Undo/redo, auto-save, and dirty-state tracking.
