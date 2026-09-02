@@ -3,8 +3,15 @@
 import { useCallback, useMemo } from "react";
 import { StorageManager } from "../engines/storage-manager";
 
-export function useStorage(prefix = "itsjust") {
-  const manager = useMemo(() => new StorageManager(prefix), [prefix]);
+export function useStorage(
+  prefix = "itsjust",
+  options: { onQuotaExceeded?: (key: string) => void } = {},
+) {
+  const { onQuotaExceeded } = options;
+  const manager = useMemo(
+    () => new StorageManager(prefix, "1.0.0", 2048, { onQuotaExceeded }),
+    [prefix, onQuotaExceeded],
+  );
 
   const save = useCallback(
     <T>(key: string, data: T) => manager.save(key, data),

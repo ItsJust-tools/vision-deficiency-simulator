@@ -4,6 +4,7 @@ import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import type { AutoSaveOptions, ToolState } from "../types";
 import { defaultAutoSaveOptions } from "../types";
 import { StorageManager } from "../engines/storage-manager";
+import { safeGetItem, safeSetItem } from "../engines/safe-storage";
 
 const HISTORY_KEY = (key: string) => `itsjust:history:${key}`;
 const NAMESPACE_KEY = "itsjust:storage-namespace";
@@ -52,8 +53,16 @@ export function useToolState<T>(
       new StorageManager(
         `itsjust:${storageNamespace}:${opts.key}`,
         opts.version ?? "1.0.0",
+        2048,
+        { onQuotaExceeded: opts.onQuotaExceeded },
       ),
-    [opts.key, opts.version, opts.storageManager, storageNamespace],
+    [
+      opts.key,
+      opts.version,
+      opts.storageManager,
+      opts.onQuotaExceeded,
+      storageNamespace,
+    ],
   );
   const historyStorage = useMemo(
     () =>
@@ -84,11 +93,13 @@ export function useToolState<T>(
     if (!opts.enabled) return;
     try {
       if (!historyStorage) return;
-      const raw = historyStorage.getItem(
+      const raw = safeGetItem(
+        historyStorage as Storage,
         HISTORY_KEY(`${historyPrefix}:${opts.key}`),
+        { onQuotaExceeded: opts.onQuotaExceeded },
       );
-      if (raw) {
-        const parsed = JSON.parse(raw);
+      if (raw.ok && raw.value) {
+        const parsed = JSON.parse(raw.value);
         if (Array.isArray(parsed.history) && parsed.history.length > 0) {
           historyRef.current = parsed.history;
           futureRef.current = parsed.future ?? [];
@@ -124,19 +135,35 @@ export function useToolState<T>(
     storage,
     historyPrefix,
     historyStorage,
+    opts.onQuotaExceeded,
   ]);
 
   // Persist history on change
   const persistHistory = useCallback(async () => {
     try {
       if (!historyStorage) return false;
-      historyStorage.setItem(
+      const result = safeSetItem(
+        historyStorage as Storage,
         HISTORY_KEY(`${historyPrefix}:${opts.key}`),
         JSON.stringify({
           history: historyRef.current,
           future: futureRef.current,
         }),
+        { onQuotaExceeded: opts.onQuotaExceeded },
       );
+      if (!result.ok) {
+        if (result.kind === "quota-exceeded") {
+          console.warn(
+            `[useToolState] Quota exceeded persisting history for "${opts.key}"`,
+          );
+        } else {
+          console.warn(
+            `[useToolState] Failed to persist history for "${opts.key}"`,
+            result.kind,
+          );
+        }
+        return false;
+      }
       return true;
     } catch (error) {
       if (
@@ -154,7 +181,7 @@ export function useToolState<T>(
       }
       return false;
     }
-  }, [opts.key, historyPrefix, historyStorage]);
+  }, [opts.key, historyPrefix, historyStorage, opts.onQuotaExceeded]);
 
   useEffect(() => {
     if (!opts.enabled) return;

@@ -100,4 +100,47 @@ describe("StorageManager", () => {
     );
     warnSpy.mockRestore();
   });
+
+  it("invokes onQuotaExceeded callback when quota is exceeded", async () => {
+    const onQuotaExceeded = vi.fn();
+    const quotaManager = new StorageManager("test", "1.0.0", 2048, {
+      onQuotaExceeded,
+    });
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("Quota exceeded", "QuotaExceededError");
+    });
+
+    await expect(
+      quotaManager.save("overflow", "x".repeat(1024)),
+    ).rejects.toThrow();
+    expect(onQuotaExceeded).toHaveBeenCalledWith("test:overflow");
+  });
+
+  it("treats storage read failures as missing (private browsing)", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new DOMException("Access denied", "SecurityError");
+    });
+
+    const result = manager.loadEntry("key");
+    expect(result.status).toBe("missing");
+    expect(result.data).toBeNull();
+    warnSpy.mockRestore();
+  });
+
+  it("does not throw when removeItem fails", () => {
+    vi.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
+      throw new DOMException("Access denied", "SecurityError");
+    });
+    expect(() => manager.remove("key")).not.toThrow();
+  });
+
+  it("supports a custom storage area", async () => {
+    const session = new StorageManager("test", "1.0.0", 2048, {
+      storage: sessionStorage,
+    });
+    await session.save("key", { a: 1 });
+    expect(session.load<{ a: number }>("key")).toEqual({ a: 1 });
+    expect(localStorage.getItem("test:key")).toBeNull();
+  });
 });

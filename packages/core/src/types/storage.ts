@@ -21,6 +21,11 @@ export interface AutoSaveOptions {
   };
   historyStorage?: Pick<Storage, "getItem" | "setItem">;
   historyNamespace?: string;
+  /**
+   * Invoked when a `QuotaExceededError` is caught while persisting state or
+   * history. Use to surface a non-intrusive warning toast.
+   */
+  onQuotaExceeded?: (key: string) => void;
 }
 
 export const defaultAutoSaveOptions: AutoSaveOptions = {

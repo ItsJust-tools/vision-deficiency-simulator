@@ -1,5 +1,11 @@
 import type { StorageData } from "../types";
 import { compressToUTF16, decompressFromUTF16 } from "lz-string";
+import {
+  safeGetItem,
+  safeRemoveItem,
+  safeSetItem,
+  type SafeStorageOptions,
+} from "./safe-storage";
 
 export type StorageLoadStatus = "missing" | "ok" | "corrupt";
 
@@ -8,19 +14,34 @@ export interface StorageLoadResult<T> {
   data: T | null;
 }
 
+export interface StorageManagerOptions extends SafeStorageOptions {
+  /**
+   * Storage area to use. Defaults to `localStorage`. Overridable for tests
+   * or for callers that prefer `sessionStorage`.
+   */
+  storage?: Storage;
+}
+
 export class StorageManager {
   private prefix: string;
   private defaultVersion?: string;
   private compressionThresholdBytes: number;
+  private storage: Storage;
+  private options: SafeStorageOptions;
 
   constructor(
     prefix = "itsjust",
     defaultVersion = "1.0.0",
     compressionThresholdBytes = 2048,
+    options: StorageManagerOptions = {},
   ) {
     this.prefix = prefix;
     this.defaultVersion = defaultVersion;
     this.compressionThresholdBytes = Math.max(0, compressionThresholdBytes);
+    this.storage =
+      options.storage ??
+      (typeof localStorage !== "undefined" ? localStorage : ({} as Storage));
+    this.options = options;
   }
 
   private key(k: string): string {
@@ -44,23 +65,36 @@ export class StorageManager {
       version: version ?? this.defaultVersion ?? "1.0.0",
       encoding,
     };
-    try {
-      localStorage.setItem(this.key(key), JSON.stringify(entry));
-    } catch (error) {
-      if (
-        error instanceof DOMException &&
-        error.name === "QuotaExceededError"
-      ) {
+    const result = safeSetItem(
+      this.storage,
+      this.key(key),
+      JSON.stringify(entry),
+      this.options,
+    );
+    if (!result.ok) {
+      if (result.kind === "quota-exceeded") {
         console.warn(`[StorageManager] Quota exceeded saving "${key}"`);
-      } else {
-        console.warn(`[StorageManager] Failed to save "${key}":`, error);
+        // Re-throw so callers that rely on failure detection (e.g. dirty-state
+        // tracking) can observe the failure, while the onQuotaExceeded callback
+        // already surfaced a non-intrusive warning toast.
+        throw new DOMException("Storage write failed", "QuotaExceededError");
       }
+      // Non-quota failure (e.g. SecurityError in private browsing). Preserve the
+      // original error so callers can inspect it.
+      const error = result.error ?? new Error("Storage write failed");
+      console.warn(`[StorageManager] Failed to save "${key}":`, error);
       throw error;
     }
   }
 
   loadEntry<T>(key: string, expectedVersion?: string): StorageLoadResult<T> {
-    const raw = localStorage.getItem(this.key(key));
+    const read = safeGetItem(this.storage, this.key(key), this.options);
+    if (!read.ok) {
+      // Storage is unavailable (e.g. private browsing). Treat as missing so the
+      // app degrades gracefully instead of throwing.
+      return { status: "missing", data: null };
+    }
+    const raw = read.value;
     if (!raw) return { status: "missing", data: null };
     try {
       const entry: StorageData<unknown> = JSON.parse(raw);
@@ -91,7 +125,7 @@ export class StorageManager {
   }
 
   remove(key: string): void {
-    localStorage.removeItem(this.key(key));
+    safeRemoveItem(this.storage, this.key(key), this.options);
   }
 }
 
