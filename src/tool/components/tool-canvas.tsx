@@ -140,7 +140,8 @@ export function ToolCanvas({
                 ? "2px dashed var(--accent)"
                 : "2px dashed var(--border)",
               background: isDragOver ? "var(--accent-subtle)" : "var(--card)",
-              transition: "all 0.15s ease",
+              transition:
+                "background-color 0.15s ease, border-color 0.15s ease",
             }}
             className="upload-mode"
             onDragOver={handleDragOver}
