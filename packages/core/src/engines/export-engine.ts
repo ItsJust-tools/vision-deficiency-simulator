@@ -6,6 +6,7 @@ import type {
   ExporterLoader,
 } from "../types";
 import { jsonExporter, exporterLoaders } from "./exporters";
+import { sanitizeFilename } from "../utils/sanitize-filename";
 
 const ALLOWED_DOWNLOAD_TYPES = new Set([
   "image/png",
@@ -32,7 +33,7 @@ function triggerDownload(result: ExportResult): void {
 
   const link = document.createElement("a");
   link.href = url;
-  link.download = result.filename.replace(/[\/\\:?*"<>|]/g, "_");
+  link.download = sanitizeFilename(result.filename);
   link.style.display = "none";
   if (!document.body) {
     console.error("[triggerDownload] Document body is not ready");

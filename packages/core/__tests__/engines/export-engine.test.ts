@@ -91,4 +91,30 @@ describe("ExportEngine", () => {
     URL.revokeObjectURL = originalRevokeObjectURL;
     vi.useRealTimers();
   });
+
+  it("sanitizes the download filename against invalid OS characters", async () => {
+    const engine = new ExportEngine();
+    const originalCreateObjectURL = URL.createObjectURL;
+    URL.createObjectURL = vi.fn(() => "blob:sanitized");
+
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(() => {});
+    const appendSpy = vi
+      .spyOn(document.body, "appendChild")
+      .mockImplementation(() => document.createElement("a"));
+
+    await engine.exportAndDownload(
+      document.createElement("div"),
+      { format: "json", filename: 'my:report/2024*"final".json' },
+      () => '{"test":true}',
+    );
+
+    const anchor = appendSpy.mock.calls[0]?.[0] as HTMLAnchorElement;
+    expect(anchor.download).toBe("my-report-2024--final-.json");
+
+    clickSpy.mockRestore();
+    appendSpy.mockRestore();
+    URL.createObjectURL = originalCreateObjectURL;
+  });
 });
