@@ -13,6 +13,16 @@ const SEMVER_RE =
   /^\d+\.\d+(?:\.\d+)?(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 
 /**
+ * Returns true when the error is a user-initiated abort of the Web Share
+ * dialog (e.g. the user closed the share sheet or pressed "Cancel").
+ * These are expected user actions and should be suppressed, not surfaced
+ * as unhandled errors.
+ */
+function isUserAbort(err: unknown): boolean {
+  return err instanceof Error && err.name === "AbortError";
+}
+
+/**
  * Client-side only share functionality - no server required.
  * Supports:
  * - Download as .itsjust.json file
@@ -128,7 +138,9 @@ export function useShare() {
         });
         return true;
       }).catch((err) => {
-        if (!(err instanceof Error) || err.name !== "AbortError") {
+        // Suppress user aborts (closing the share sheet / pressing Cancel)
+        // as an expected user action. Report any other unexpected error.
+        if (!isUserAbort(err)) {
           const message =
             err instanceof Error ? err.message : "Web share failed";
           setError(message);
