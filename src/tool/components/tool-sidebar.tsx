@@ -142,7 +142,7 @@ export function ToolSidebar({
                   filter.name === activeCondition
                     ? "var(--accent)"
                     : "transparent",
-                transition: "all 0.15s",
+                transition: "background-color 0.15s, border-color 0.15s",
               }}
             >
               {filter.description}
