@@ -33,6 +33,10 @@ export { ExportEngine, createExportEngine } from "./engines/export-engine";
 /** Manager for namespaced, versioned localStorage persistence. */
 export { StorageManager, storageManager } from "./engines/storage-manager";
 
+// Utils
+/** Copy text to clipboard with a graceful fallback for insecure origins. */
+export { copyTextToClipboard } from "./utils/clipboard";
+
 // Hooks
 /**
  * useToolState — Undo/redo, auto-save, and dirty-state tracking.

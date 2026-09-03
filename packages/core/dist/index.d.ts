@@ -227,6 +227,29 @@ declare class StorageManager {
 declare const storageManager: StorageManager;
 
 /**
+ * Clipboard helpers with a graceful fallback for insecure origins and
+ * permission rejections.
+ *
+ * `navigator.clipboard.writeText` rejects when the page is loaded over HTTP
+ * (non-secure origin), inside an unauthenticated iframe, or when the browser
+ * denies the clipboard permission by policy. In those cases we fall back to
+ * the legacy `document.execCommand("copy")` path using an off-screen
+ * textarea, which works in most browsers without the async Clipboard API.
+ */
+/**
+ * Copy `text` to the clipboard, preferring the async Clipboard API and
+ * falling back to `document.execCommand("copy")` when it is unavailable or
+ * rejects (e.g. insecure origin, unauthenticated iframe, or denied
+ * permission).
+ *
+ * @returns `true` if the text was copied, `false` if every strategy failed.
+ * @throws the original Clipboard API rejection reason when the async API
+ * rejected and the fallback also failed, so callers can surface a meaningful
+ * error message.
+ */
+declare function copyTextToClipboard(text: string): Promise<boolean>;
+
+/**
  * Hook that manages tool state with undo/redo, auto-save to localStorage,
  * and dirty-state tracking. Callers must treat state as immutable — never
  * mutate objects in-place or the dirty check will break.
@@ -618,4 +641,4 @@ type StringKey = keyof (typeof strings)["en"];
  */
 declare function t(key: StringKey, locale?: Locale, ...args: string[]): string;
 
-export { type AutoSaveOptions, ErrorBoundary, ExportEngine, type ExportFormat, type ExportOptions, type ExportResult, type Exporter, type ExporterLoader, type FeatureFlags, ImportExport, type ImportExportProps, type ImportResult, KeyboardShortcutsOverlay, type ShareData, type ShareResult, type ShortcutDef, type ShortcutGroup, type StorageData, StorageManager, ThemeProvider, ThemeScript, ToastProvider, type Tool, type ToolConfig, type ToolExporterDefinition, ToolShell, type ToolState, type ToolTheme, type ToolbarActions, type UseImportOptions, type UseToolResult, createExportEngine, defaultAutoSaveOptions, defaultFeatures, formatLabels, storageManager, t, useDragAndDropImport, useExport, useImport, useKeyboardShortcuts, usePlugins, useRelativeTime, useShare, useStorage, useTheme, useToast, useTool, useToolState, useUrlState };
+export { type AutoSaveOptions, ErrorBoundary, ExportEngine, type ExportFormat, type ExportOptions, type ExportResult, type Exporter, type ExporterLoader, type FeatureFlags, ImportExport, type ImportExportProps, type ImportResult, KeyboardShortcutsOverlay, type ShareData, type ShareResult, type ShortcutDef, type ShortcutGroup, type StorageData, StorageManager, ThemeProvider, ThemeScript, ToastProvider, type Tool, type ToolConfig, type ToolExporterDefinition, ToolShell, type ToolState, type ToolTheme, type ToolbarActions, type UseImportOptions, type UseToolResult, copyTextToClipboard, createExportEngine, defaultAutoSaveOptions, defaultFeatures, formatLabels, storageManager, t, useDragAndDropImport, useExport, useImport, useKeyboardShortcuts, usePlugins, useRelativeTime, useShare, useStorage, useTheme, useToast, useTool, useToolState, useUrlState };
