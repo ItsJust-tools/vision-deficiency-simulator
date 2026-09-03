@@ -103,6 +103,7 @@ export function ToolCanvas({
   return (
     <div
       ref={canvasRef}
+      id="main-content"
       className="vision-canvas"
       role="application"
       aria-label="Vision Deficiency Simulator"
