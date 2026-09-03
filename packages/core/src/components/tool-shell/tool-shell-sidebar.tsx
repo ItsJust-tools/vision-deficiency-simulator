@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import type { ReactNode } from "react";
 import { useShell } from "./tool-shell-context";
 import { t } from "../../i18n/strings";
+import { safeGetItem, safeSetItem } from "../../engines/safe-storage";
 
 const SIDEBAR_WIDTH_KEY = "itsjust:sidebar-width";
 const MIN_SIDEBAR_WIDTH = 180;
@@ -22,19 +23,17 @@ export function Sidebar({ children }: { children?: ReactNode }) {
   const sidebarEnabled = config.features.sidebar;
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     if (typeof window === "undefined") return DEFAULT_SIDEBAR_WIDTH;
-    try {
-      const stored = localStorage.getItem(SIDEBAR_WIDTH_KEY);
-      if (stored) {
-        const width = parseInt(stored, 10);
-        if (
-          !isNaN(width) &&
-          width >= MIN_SIDEBAR_WIDTH &&
-          width <= MAX_SIDEBAR_WIDTH
-        ) {
-          return width;
-        }
+    const read = safeGetItem(window.localStorage, SIDEBAR_WIDTH_KEY);
+    if (read.ok && read.value) {
+      const width = parseInt(read.value, 10);
+      if (
+        !isNaN(width) &&
+        width >= MIN_SIDEBAR_WIDTH &&
+        width <= MAX_SIDEBAR_WIDTH
+      ) {
+        return width;
       }
-    } catch {}
+    }
     return DEFAULT_SIDEBAR_WIDTH;
   });
   const [isResizing, setIsResizing] = useState(false);
@@ -67,12 +66,11 @@ export function Sidebar({ children }: { children?: ReactNode }) {
       setIsResizing(false);
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
-      try {
-        localStorage.setItem(
-          SIDEBAR_WIDTH_KEY,
-          String(sidebarWidthRef.current),
-        );
-      } catch {}
+      safeSetItem(
+        window.localStorage,
+        SIDEBAR_WIDTH_KEY,
+        String(sidebarWidthRef.current),
+      );
     }
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);

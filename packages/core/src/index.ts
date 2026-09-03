@@ -32,6 +32,17 @@ export { defaultFeatures, defaultAutoSaveOptions, formatLabels } from "./types";
 export { ExportEngine, createExportEngine } from "./engines/export-engine";
 /** Manager for namespaced, versioned localStorage persistence. */
 export { StorageManager, storageManager } from "./engines/storage-manager";
+/** Defensive wrappers around the Web Storage API (quota/security safe). */
+export {
+  safeGetItem,
+  safeSetItem,
+  safeRemoveItem,
+  classifyStorageError,
+  type SafeStorageOptions,
+  type StorageErrorKind,
+  type StorageReadResult,
+  type StorageWriteResult,
+} from "./engines/safe-storage";
 
 // Utils
 /** Copy text to clipboard with a graceful fallback for insecure origins. */

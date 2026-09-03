@@ -181,4 +181,32 @@ describe("useToolState", () => {
     );
     warnSpy.mockRestore();
   });
+
+  it("invokes onQuotaExceeded callback when history persistence fails", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const onQuotaExceeded = vi.fn();
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation((key: string) => {
+      if (String(key).startsWith("itsjust:history:")) {
+        throw new DOMException("Quota exceeded", "QuotaExceededError");
+      }
+    });
+
+    const { result } = renderHook(() =>
+      useToolState("initial", {
+        key: "test-quota-toast",
+        enabled: true,
+        debounceMs: 500,
+        onQuotaExceeded,
+      }),
+    );
+
+    act(() => result.current.setData("change"));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(500);
+    });
+
+    expect(onQuotaExceeded).toHaveBeenCalled();
+    expect(result.current.data).toBe("change");
+    warnSpy.mockRestore();
+  });
 });
