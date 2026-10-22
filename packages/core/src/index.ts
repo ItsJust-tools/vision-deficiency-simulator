@@ -5,7 +5,7 @@
  */
 
 // Tool contract
-export type { Tool, ToolExporterDefinition } from "./tool";
+export type { Tool, ToolExporterDefinition, DeserializeResult } from "./tool";
 
 // Types
 export type {

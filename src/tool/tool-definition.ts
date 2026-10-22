@@ -1,10 +1,17 @@
-import type { Tool } from "@itsjust/core";
+import type { DeserializeResult, Tool } from "@itsjust/core";
 import toolConfig from "./tool.config";
 import type { SimulationResult, VisionState } from "./types";
 
 /** Canonical state shape description used by every failure message. */
 const STATE_SHAPE =
   "{ uploadMode: boolean, imageSrc?: string, activeCondition: string, intensity: number, results?: SimulationResult[], notes?: string }";
+
+/** Shape of a `.itsjust.json` share envelope (see `useImport`). */
+const SHARE_SCHEMA_URI = "https://itsjust.tools/schema/v1";
+
+/** Lower/upper bounds enforced by the UI intensity slider. */
+const MIN_INTENSITY = 0;
+const MAX_INTENSITY = 100;
 
 /**
  * Produces a human-readable description of an arbitrary thrown value.
@@ -23,19 +30,26 @@ function describeError(error: unknown): string {
 }
 
 /**
+ * Type guard for a plain object. Arrays, functions, and `null` are rejected
+ * because every persisted state payload must be a JSON object.
+ */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
  * Type guard for a single simulation result entry.
  * Validates every field consumed by the UI so corrupted share files cannot
  * reach rendering code with the wrong shape.
  */
 function isSimulationResult(value: unknown): value is SimulationResult {
-  if (typeof value !== "object" || value === null) return false;
-  const v = value as Record<string, unknown>;
+  if (!isRecord(value)) return false;
   return (
-    typeof v.condition === "string" &&
-    typeof v.description === "string" &&
-    typeof v.cssFilter === "string" &&
-    typeof v.intensity === "number" &&
-    Number.isFinite(v.intensity)
+    typeof value.condition === "string" &&
+    typeof value.description === "string" &&
+    typeof value.cssFilter === "string" &&
+    typeof value.intensity === "number" &&
+    Number.isFinite(value.intensity)
   );
 }
 
@@ -45,25 +59,63 @@ function isSimulationResult(value: unknown): value is SimulationResult {
  * without them keep loading.
  */
 function isVisionState(value: unknown): value is VisionState {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+  if (!isRecord(value)) return false;
+  if (typeof value.uploadMode !== "boolean") return false;
+  if (typeof value.activeCondition !== "string") return false;
+  if (
+    typeof value.intensity !== "number" ||
+    !Number.isFinite(value.intensity)
+  ) {
     return false;
   }
-  const v = value as Record<string, unknown>;
-  if (typeof v.uploadMode !== "boolean") return false;
-  if (typeof v.activeCondition !== "string") return false;
-  if (typeof v.intensity !== "number" || !Number.isFinite(v.intensity)) {
+  if (
+    value.showOriginal !== undefined &&
+    typeof value.showOriginal !== "boolean"
+  ) {
     return false;
   }
-  if (v.showOriginal !== undefined && typeof v.showOriginal !== "boolean") {
+  if (value.imageSrc !== undefined && typeof value.imageSrc !== "string") {
     return false;
   }
-  if (v.imageSrc !== undefined && typeof v.imageSrc !== "string") return false;
-  if (v.notes !== undefined && typeof v.notes !== "string") return false;
-  if (v.results !== undefined) {
-    if (!Array.isArray(v.results)) return false;
-    if (!v.results.every(isSimulationResult)) return false;
+  if (value.notes !== undefined && typeof value.notes !== "string")
+    return false;
+  if (value.results !== undefined) {
+    if (!Array.isArray(value.results)) return false;
+    if (!value.results.every(isSimulationResult)) return false;
   }
   return true;
+}
+
+/** Clamps intensity into the range the UI can represent. */
+function clampIntensity(intensity: number): number {
+  return Math.min(MAX_INTENSITY, Math.max(MIN_INTENSITY, intensity));
+}
+
+/**
+ * Unwraps a `.itsjust.json` share envelope so a payload taken straight from
+ * `useImport` without preprocessing still resolves to the inner state.
+ * Returns `null` when the value is not a share envelope.
+ */
+function unwrapShareEnvelope(value: unknown): unknown {
+  if (!isRecord(value) || value.$schema !== SHARE_SCHEMA_URI) return null;
+  return value.content;
+}
+
+/**
+ * Builds a fully-populated {@link VisionState} from validated input so every
+ * consumer receives the exact same shape, regardless of which optional fields
+ * the share file happened to include.
+ */
+function toVisionState(state: VisionState): VisionState {
+  return {
+    uploadMode: state.uploadMode,
+    imageSrc: state.imageSrc || "",
+    activeCondition: state.activeCondition,
+    intensity: clampIntensity(state.intensity),
+    showOriginal: state.showOriginal ?? false,
+    results: state.results ?? [],
+    notes: state.notes ?? "",
+  };
 }
 
 export const visionTool: Tool<VisionState> = {
@@ -94,10 +146,14 @@ export const visionTool: Tool<VisionState> = {
       null,
       2,
     ),
-  deserialize: (data) => {
-    // Deserialization must never throw: malformed share files, wrong shapes,
-    // nulls, and hostile input (throwing getters, Proxies) are all reported
-    // through the DeserializeResult contract instead.
+  /**
+   * Recovers state from an imported / shared payload.
+   *
+   * Always returns the canonical `DeserializeResult<VisionState>` union — it
+   * never returns raw state and never throws, so `useImport` and error
+   * boundaries can branch on `success` without try/catch of their own.
+   */
+  deserialize: (data): DeserializeResult<VisionState> => {
     try {
       if (typeof data === "string") {
         return {
@@ -107,19 +163,10 @@ export const visionTool: Tool<VisionState> = {
         };
       }
 
-      if (isVisionState(data)) {
-        return {
-          success: true,
-          data: {
-            uploadMode: data.uploadMode,
-            imageSrc: data.imageSrc || "",
-            activeCondition: data.activeCondition,
-            intensity: data.intensity,
-            showOriginal: data.showOriginal ?? false,
-            results: data.results || [],
-            notes: data.notes || "",
-          },
-        };
+      const candidate = unwrapShareEnvelope(data) ?? data;
+
+      if (isVisionState(candidate)) {
+        return { success: true, data: toVisionState(candidate) };
       }
 
       return {

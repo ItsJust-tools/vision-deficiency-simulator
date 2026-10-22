@@ -112,6 +112,11 @@ interface AutoSaveOptions {
     };
     historyStorage?: Pick<Storage, "getItem" | "setItem">;
     historyNamespace?: string;
+    /**
+     * Invoked when a `QuotaExceededError` is caught while persisting state or
+     * history. Use to surface a non-intrusive warning toast.
+     */
+    onQuotaExceeded?: (key: string) => void;
 }
 declare const defaultAutoSaveOptions: AutoSaveOptions;
 
@@ -208,16 +213,75 @@ declare class ExportEngine {
 }
 declare function createExportEngine(localLoaders?: Partial<Record<ExportFormat, ExporterLoader>>, maxExporterCacheSize?: number): ExportEngine;
 
+/**
+ * Defensive wrappers around the Web Storage API (`localStorage` / `sessionStorage`).
+ *
+ * Browsers in Private/Incognito mode, or devices with low disk space, can throw
+ * `DOMException: QuotaExceededError` or `SecurityError` on `setItem`/`getItem`/
+ * `removeItem`. Unhandled storage exceptions can break the application state flow
+ * or cause UI freezes.
+ *
+ * These helpers wrap every storage call in a `try/catch`, classify the failure,
+ * and optionally invoke an `onQuotaExceeded` callback so the UI can surface a
+ * non-intrusive warning toast.
+ */
+type StorageErrorKind = "quota-exceeded" | "security" | "unknown";
+interface StorageWriteResult {
+    ok: boolean;
+    kind: StorageErrorKind | null;
+    /** The original caught error, when `ok` is `false`. */
+    error?: unknown;
+}
+interface StorageReadResult<T> {
+    ok: boolean;
+    value: T | null;
+    kind: StorageErrorKind | null;
+    /** The original caught error, when `ok` is `false`. */
+    error?: unknown;
+}
+interface SafeStorageOptions {
+    /** Invoked when a `QuotaExceededError` is caught. Use to show a warning toast. */
+    onQuotaExceeded?: (key: string) => void;
+    /** Invoked for any other storage failure (e.g. `SecurityError` in private mode). */
+    onError?: (key: string, error: unknown) => void;
+}
+/** Classify a caught storage error into a stable kind. */
+declare function classifyStorageError(error: unknown): StorageErrorKind;
+/**
+ * Defensively read a value from a storage area.
+ * Returns `{ ok: false, value: null, kind }` instead of throwing.
+ */
+declare function safeGetItem(storage: Storage, key: string, options?: SafeStorageOptions): StorageReadResult<string>;
+/**
+ * Defensively write a value to a storage area.
+ * Returns `{ ok: false, kind }` instead of throwing.
+ */
+declare function safeSetItem(storage: Storage, key: string, value: string, options?: SafeStorageOptions): StorageWriteResult;
+/**
+ * Defensively remove a key from a storage area.
+ * Returns `{ ok: false, kind }` instead of throwing.
+ */
+declare function safeRemoveItem(storage: Storage, key: string, options?: SafeStorageOptions): StorageWriteResult;
+
 type StorageLoadStatus = "missing" | "ok" | "corrupt";
 interface StorageLoadResult<T> {
     status: StorageLoadStatus;
     data: T | null;
 }
+interface StorageManagerOptions extends SafeStorageOptions {
+    /**
+     * Storage area to use. Defaults to `localStorage`. Overridable for tests
+     * or for callers that prefer `sessionStorage`.
+     */
+    storage?: Storage;
+}
 declare class StorageManager {
     private prefix;
     private defaultVersion?;
     private compressionThresholdBytes;
-    constructor(prefix?: string, defaultVersion?: string, compressionThresholdBytes?: number);
+    private storage;
+    private options;
+    constructor(prefix?: string, defaultVersion?: string, compressionThresholdBytes?: number, options?: StorageManagerOptions);
     private key;
     save<T>(key: string, data: T, version?: string): Promise<void>;
     loadEntry<T>(key: string, expectedVersion?: string): StorageLoadResult<T>;
@@ -447,7 +511,9 @@ declare function useShare(): {
     clearShare: () => void;
 };
 
-declare function useStorage(prefix?: string): {
+declare function useStorage(prefix?: string, options?: {
+    onQuotaExceeded?: (key: string) => void;
+}): {
     save: <T>(key: string, data: T) => Promise<void>;
     load: <T>(key: string) => T | null;
     clear: (key: string) => void;
@@ -641,4 +707,4 @@ type StringKey = keyof (typeof strings)["en"];
  */
 declare function t(key: StringKey, locale?: Locale, ...args: string[]): string;
 
-export { type AutoSaveOptions, ErrorBoundary, ExportEngine, type ExportFormat, type ExportOptions, type ExportResult, type Exporter, type ExporterLoader, type FeatureFlags, ImportExport, type ImportExportProps, type ImportResult, KeyboardShortcutsOverlay, type ShareData, type ShareResult, type ShortcutDef, type ShortcutGroup, type StorageData, StorageManager, ThemeProvider, ThemeScript, ToastProvider, type Tool, type ToolConfig, type ToolExporterDefinition, ToolShell, type ToolState, type ToolTheme, type ToolbarActions, type UseImportOptions, type UseToolResult, copyTextToClipboard, createExportEngine, defaultAutoSaveOptions, defaultFeatures, formatLabels, storageManager, t, useDragAndDropImport, useExport, useImport, useKeyboardShortcuts, usePlugins, useRelativeTime, useShare, useStorage, useTheme, useToast, useTool, useToolState, useUrlState };
+export { type AutoSaveOptions, type DeserializeResult, ErrorBoundary, ExportEngine, type ExportFormat, type ExportOptions, type ExportResult, type Exporter, type ExporterLoader, type FeatureFlags, ImportExport, type ImportExportProps, type ImportResult, KeyboardShortcutsOverlay, type SafeStorageOptions, type ShareData, type ShareResult, type ShortcutDef, type ShortcutGroup, type StorageData, type StorageErrorKind, StorageManager, type StorageReadResult, type StorageWriteResult, ThemeProvider, ThemeScript, ToastProvider, type Tool, type ToolConfig, type ToolExporterDefinition, ToolShell, type ToolState, type ToolTheme, type ToolbarActions, type UseImportOptions, type UseToolResult, classifyStorageError, copyTextToClipboard, createExportEngine, defaultAutoSaveOptions, defaultFeatures, formatLabels, safeGetItem, safeRemoveItem, safeSetItem, storageManager, t, useDragAndDropImport, useExport, useImport, useKeyboardShortcuts, usePlugins, useRelativeTime, useShare, useStorage, useTheme, useToast, useTool, useToolState, useUrlState };
