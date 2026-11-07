@@ -4,7 +4,7 @@ import type { SimulationResult, VisionState } from "./types";
 
 /** Canonical state shape description used by every failure message. */
 const STATE_SHAPE =
-  "{ uploadMode: boolean, imageSrc?: string, activeCondition: string, intensity: number, results?: SimulationResult[], notes?: string, webcamMode?: boolean }";
+  "{ uploadMode: boolean, imageSrc?: string, activeCondition: string, intensity: number, results?: SimulationResult[], notes?: string, webcamMode?: boolean, compareMode?: boolean, splitPosition?: number }";
 
 /** Shape of a `.itsjust.json` share envelope (see `useImport`). */
 const SHARE_SCHEMA_URI = "https://itsjust.tools/schema/v1";
@@ -81,6 +81,15 @@ function isVisionState(value: unknown): value is VisionState {
     return false;
   if (value.webcamMode !== undefined && typeof value.webcamMode !== "boolean")
     return false;
+  if (value.compareMode !== undefined && typeof value.compareMode !== "boolean")
+    return false;
+  if (
+    value.splitPosition !== undefined &&
+    (typeof value.splitPosition !== "number" ||
+      !Number.isFinite(value.splitPosition))
+  ) {
+    return false;
+  }
   if (value.results !== undefined) {
     if (!Array.isArray(value.results)) return false;
     if (!value.results.every(isSimulationResult)) return false;
@@ -115,6 +124,8 @@ function toVisionState(state: VisionState): VisionState {
     activeCondition: state.activeCondition,
     intensity: clampIntensity(state.intensity),
     showOriginal: state.showOriginal ?? false,
+    compareMode: state.compareMode ?? false,
+    splitPosition: clampIntensity(state.splitPosition ?? 50),
     results: state.results ?? [],
     notes: state.notes ?? "",
     webcamMode: false, // camera streams never persist across sessions
@@ -132,6 +143,8 @@ export const visionTool: Tool<VisionState> = {
     activeCondition: "normal",
     intensity: 50,
     showOriginal: false,
+    compareMode: false,
+    splitPosition: 50,
     results: [],
     notes: "",
     webcamMode: false,

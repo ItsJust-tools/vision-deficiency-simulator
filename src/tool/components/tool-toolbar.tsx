@@ -12,10 +12,12 @@ interface ToolToolbarProps {
   activeCondition: VisionCondition;
   intensity: number;
   showOriginal: boolean;
+  compareMode?: boolean;
   onConditionChange?: (condition: VisionCondition) => void;
   onIntensityChange?: (value: number) => void;
   onReset?: () => void;
   onToggleOriginal?: () => void;
+  onToggleCompare?: () => void;
 }
 
 export function ToolToolbar({
@@ -25,10 +27,12 @@ export function ToolToolbar({
   activeCondition,
   intensity,
   showOriginal,
+  compareMode,
   onConditionChange,
   onIntensityChange,
   onReset,
   onToggleOriginal,
+  onToggleCompare,
 }: ToolToolbarProps) {
   return (
     <nav
@@ -59,6 +63,10 @@ export function ToolToolbar({
             showOriginal={showOriginal}
             onToggle={onToggleOriginal}
           />
+          <SplitCompareButton
+            compareMode={compareMode}
+            onToggle={onToggleCompare}
+ />
           <ExportButton onExport={onExport} />
           <ResetButton onReset={onReset} />
         </>
@@ -259,6 +267,48 @@ function CompareButton({
       }}
     >
       {showOriginal ? "🔍 Original" : "👁️ Compare"}
+    </button>
+  );
+}
+
+function SplitCompareButton({
+  compareMode,
+  onToggle,
+}: {
+  compareMode?: boolean;
+  onToggle?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-label={
+        compareMode
+          ? "Exit split comparison view"
+          : "Show side-by-side split comparison of original and simulated view"
+      }
+      aria-pressed={compareMode}
+      title="Toggle split comparison slider"
+      style={{
+        fontSize: "0.8125rem",
+        fontWeight: 500,
+        padding: "0.375rem 0.75rem",
+        border: compareMode
+          ? "2px solid var(--accent)"
+          : "1px solid var(--border)",
+        borderRadius: "var(--radius)",
+        background: compareMode ? "var(--accent-subtle)" : "var(--card)",
+        color: compareMode ? "var(--accent)" : "var(--foreground)",
+        cursor: "pointer",
+        fontFamily: "inherit",
+        display: "flex",
+        alignItems: "center",
+        gap: "0.375rem",
+        transition:
+          "background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease",
+      }}
+    >
+      {compareMode ? "📐 Split On" : "📐 Split Compare"}
     </button>
   );
 }

@@ -48,6 +48,8 @@ export default function ToolClient() {
       activeCondition: "normal",
       intensity: 50,
       showOriginal: false,
+      compareMode: false,
+      splitPosition: 50,
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
   }, [state.setData]);
@@ -85,6 +87,27 @@ export default function ToolClient() {
     state.setData((prev) => ({ ...prev, showOriginal: !prev.showOriginal }));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
   }, [state.setData]);
+
+  const handleToggleCompare = useCallback(() => {
+    state.setData((prev) => ({
+      ...prev,
+      compareMode: !prev.compareMode,
+      showOriginal: false,
+      splitPosition: prev.splitPosition ?? 50,
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
+  }, [state.setData]);
+
+  const handleSplitPositionChange = useCallback(
+    (position: number) => {
+      state.setData((prev) => ({
+        ...prev,
+        splitPosition: Math.min(100, Math.max(0, position)),
+      }));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
+    [state.setData],
+  );
 
   const handleWebcamModeChange = useCallback(
     (on: boolean) => {
@@ -178,6 +201,8 @@ export default function ToolClient() {
         activeCondition={state.data.activeCondition}
         intensity={state.data.intensity}
         showOriginal={state.data.showOriginal}
+        compareMode={state.data.compareMode}
+        onToggleCompare={handleToggleCompare}
         onConditionChange={handleConditionChange}
         onIntensityChange={(value) =>
           state.setData((prev) => ({ ...prev, intensity: value }))
@@ -190,6 +215,9 @@ export default function ToolClient() {
         activeCondition={state.data.activeCondition}
         intensity={state.data.intensity}
         showOriginal={state.data.showOriginal}
+        compareMode={state.data.compareMode}
+        splitPosition={state.data.splitPosition ?? 50}
+        onSplitPositionChange={handleSplitPositionChange}
         webcamMode={state.data.webcamMode ?? false}
         onWebcamModeChange={handleWebcamModeChange}
         canvasRef={canvasRef}
