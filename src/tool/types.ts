@@ -33,6 +33,10 @@ export interface VisionState {
   activeCondition: VisionCondition;
   intensity: number; // 0-100
   showOriginal: boolean; // toggle to show unfiltered image
+  /** Interactive side-by-side split comparison between original and simulated view. */
+  compareMode?: boolean;
+  /** Split position in percent (0–100); 50 = centered divider. */
+  splitPosition?: number;
   results: SimulationResult[];
   notes: string;
   /** Live camera simulation mode (not serialized — streams cannot persist). */

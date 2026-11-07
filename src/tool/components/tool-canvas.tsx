@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useWebcam, type WebcamStatus } from "@/tool/hooks/use-webcam";
 import {
@@ -14,6 +14,9 @@ interface ToolCanvasProps {
   activeCondition: string;
   intensity: number;
   showOriginal: boolean;
+  compareMode?: boolean;
+  splitPosition?: number;
+  onSplitPositionChange?: (position: number) => void;
   canvasRef?: React.RefObject<HTMLDivElement | null>;
   onUpload?: (imageSrc: string) => void;
   webcamMode?: boolean;
@@ -38,6 +41,9 @@ export function ToolCanvas({
   activeCondition,
   intensity,
   showOriginal,
+  compareMode = false,
+  splitPosition = 50,
+  onSplitPositionChange,
   canvasRef,
   onUpload,
   webcamMode = false,
@@ -68,6 +74,37 @@ export function ToolCanvas({
   };
 
   const isGlaucoma = activeCondition === "glaucoma";
+  const [isDraggingSplit, setIsDraggingSplit] = useState(false);
+  const splitContainerRef = useRef<HTMLDivElement>(null);
+
+  /** Compute splitter position from a pointer event relative to the container. */
+  const updateSplitFromClientX = useCallback(
+    (clientX: number) => {
+      const container = splitContainerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      if (rect.width === 0) return;
+      const pct = ((clientX - rect.left) / rect.width) * 100;
+      const clamped = Math.min(100, Math.max(0, pct));
+      onSplitPositionChange?.(Math.round(clamped * 10) / 10);
+    },
+    [onSplitPositionChange],
+  );
+
+  useEffect(() => {
+    if (!isDraggingSplit) return;
+    const handleMove = (e: PointerEvent) => {
+      e.preventDefault();
+      updateSplitFromClientX(e.clientX);
+    };
+    const handleUp = () => setIsDraggingSplit(false);
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp);
+    return () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+    };
+  }, [isDraggingSplit, updateSplitFromClientX]);
 
   const handleFileUpload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -317,8 +354,200 @@ export function ToolCanvas({
           </div>
         ) : (
           <>
-            {/* Image Display with Overlay */}
-            <div
+            {/* Image Display: interactive split comparison or filtered view */}
+            {compareMode ? (
+              <div
+                ref={splitContainerRef}
+                className="split-compare"
+                data-testid="split-compare"
+                role="group"
+                aria-label="Side-by-side comparison of the original image and the simulated view. Drag the divider to compare."
+                style={{
+                  position: "relative",
+                  maxWidth: "100%",
+                  maxHeight: "80vh",
+                  overflow: "hidden",
+                  touchAction: "none",
+                  userSelect: isDraggingSplit ? "none" : undefined,
+                }}
+                onPointerDown={(e) => {
+                  if (e.button !== 0) return;
+                  setIsDraggingSplit(true);
+                  updateSplitFromClientX(e.clientX);
+                }}
+              >
+                {/* Base layer: simulated view */}
+                <Image
+                  src={imageSrc!}
+                  alt={`Uploaded image shown with ${activeFilter.description} simulation at ${intensity}% intensity`}
+                  width={1200}
+                  height={800}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "80vh",
+                    width: "100%",
+                    objectFit: "contain",
+                    display: "block",
+                  }}
+                  unoptimized
+                />
+                {!isGlaucoma ? (
+                  <div
+                    className="vision-overlay"
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      pointerEvents: "none",
+                      filter: activeFilter.cssFilter,
+                      opacity: intensity / 100,
+                    }}
+                  />
+                ) : (
+                  <>
+                    <div
+                      className="vision-overlay"
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        pointerEvents: "none",
+                        filter: activeFilter.cssFilter,
+                        opacity: intensity / 100,
+                      }}
+                    />
+                    <div
+                      className="glaucoma-overlay"
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        pointerEvents: "none",
+                        background: `radial-gradient(circle at center, transparent ${100 - intensity}%, rgba(0,0,0,0.85) 100%)`,
+                        opacity: intensity / 100,
+                      }}
+                    />
+                  </>
+                )}
+                {/* Original layer clipped to the left of the divider */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    clipPath: `inset(0 ${100 - splitPosition}% 0 0)`,
+                    pointerEvents: "none",
+                    background: "var(--card, #fff)",
+                  }}
+                >
+                  <Image
+                    src={imageSrc!}
+                    alt="Original image (no filter)"
+                    width={1200}
+                    height={800}
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "80vh",
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      display: "block",
+                    }}
+                    unoptimized
+                  />
+                </div>
+                {/* Divider handle */}
+                <div
+                  role="slider"
+                  tabIndex={0}
+                  aria-label="Comparison split position"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(splitPosition)}
+                  aria-valuetext={`${Math.round(splitPosition)}% original, ${Math.round(100 - splitPosition)}% simulated`}
+                  data-testid="split-handle"
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowLeft") {
+                      e.preventDefault();
+                      onSplitPositionChange?.(Math.max(0, splitPosition - 2));
+                    } else if (e.key === "ArrowRight") {
+                      e.preventDefault();
+                      onSplitPositionChange?.(
+                        Math.min(100, splitPosition + 2),
+                      );
+                    } else if (e.key === "Home") {
+                      e.preventDefault();
+                      onSplitPositionChange?.(0);
+                    } else if (e.key === "End") {
+                      e.preventDefault();
+                      onSplitPositionChange?.(100);
+                    }
+                  }}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    bottom: 0,
+                    left: `${splitPosition}%`,
+                    width: "2px",
+                    background: "var(--accent)",
+                    cursor: "ew-resize",
+                    transform: "translateX(-1px)",
+                    touchAction: "none",
+                  }}
+                >
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "2rem",
+                      height: "2rem",
+                      borderRadius: "50%",
+                      background: "var(--accent)",
+                      color: "#fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "0.75rem",
+                      pointerEvents: "none",
+                      boxShadow: "0 1px 4px rgba(0,0,0,0.35)",
+                    }}
+                  >
+                    ↔
+                  </div>
+                </div>
+                {/* Labels */}
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "0.5rem",
+                    left: "0.5rem",
+                    fontSize: "0.6875rem",
+                    padding: "0.125rem 0.5rem",
+                    borderRadius: "var(--radius)",
+                    background: "rgba(0,0,0,0.55)",
+                    color: "#fff",
+                    pointerEvents: "none",
+                  }}
+                >
+                  Original
+                </span>
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "0.5rem",
+                    right: "0.5rem",
+                    fontSize: "0.6875rem",
+                    padding: "0.125rem 0.5rem",
+                    borderRadius: "var(--radius)",
+                    background: "rgba(0,0,0,0.55)",
+                    color: "#fff",
+                    pointerEvents: "none",
+                  }}
+                >
+                  {activeFilter.description} — {intensity}%
+                </span>
+              </div>
+            ) : (
+              <div
               className="image-container"
               style={{
                 position: "relative",
@@ -381,6 +610,7 @@ export function ToolCanvas({
                   />
                 ))}
             </div>
+            )}
 
             {/* Info */}
             <div

@@ -34,6 +34,8 @@ describe("visionTool.deserialize - DeserializeResult contract", () => {
       activeCondition: "normal",
       intensity: 50,
       showOriginal: false,
+      compareMode: false,
+      splitPosition: 50,
       results: [],
       notes: "",
       webcamMode: false,
