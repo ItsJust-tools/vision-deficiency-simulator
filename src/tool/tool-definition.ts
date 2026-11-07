@@ -4,7 +4,7 @@ import type { SimulationResult, VisionState } from "./types";
 
 /** Canonical state shape description used by every failure message. */
 const STATE_SHAPE =
-  "{ uploadMode: boolean, imageSrc?: string, activeCondition: string, intensity: number, results?: SimulationResult[], notes?: string }";
+  "{ uploadMode: boolean, imageSrc?: string, activeCondition: string, intensity: number, results?: SimulationResult[], notes?: string, webcamMode?: boolean }";
 
 /** Shape of a `.itsjust.json` share envelope (see `useImport`). */
 const SHARE_SCHEMA_URI = "https://itsjust.tools/schema/v1";
@@ -79,6 +79,8 @@ function isVisionState(value: unknown): value is VisionState {
   }
   if (value.notes !== undefined && typeof value.notes !== "string")
     return false;
+  if (value.webcamMode !== undefined && typeof value.webcamMode !== "boolean")
+    return false;
   if (value.results !== undefined) {
     if (!Array.isArray(value.results)) return false;
     if (!value.results.every(isSimulationResult)) return false;
@@ -115,6 +117,7 @@ function toVisionState(state: VisionState): VisionState {
     showOriginal: state.showOriginal ?? false,
     results: state.results ?? [],
     notes: state.notes ?? "",
+    webcamMode: false, // camera streams never persist across sessions
   };
 }
 
@@ -131,6 +134,7 @@ export const visionTool: Tool<VisionState> = {
     showOriginal: false,
     results: [],
     notes: "",
+    webcamMode: false,
   },
   serialize: (state) =>
     JSON.stringify(

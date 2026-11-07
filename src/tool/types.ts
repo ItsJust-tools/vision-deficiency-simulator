@@ -35,6 +35,8 @@ export interface VisionState {
   showOriginal: boolean; // toggle to show unfiltered image
   results: SimulationResult[];
   notes: string;
+  /** Live camera simulation mode (not serialized — streams cannot persist). */
+  webcamMode?: boolean;
 }
 
 /**

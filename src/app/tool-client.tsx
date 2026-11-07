@@ -86,6 +86,14 @@ export default function ToolClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
   }, [state.setData]);
 
+  const handleWebcamModeChange = useCallback(
+    (on: boolean) => {
+      state.setData((prev) => ({ ...prev, webcamMode: on }));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setData is stable
+    [state.setData],
+  );
+
   const activeCondition = state.data.activeCondition;
 
   /**
@@ -182,6 +190,8 @@ export default function ToolClient() {
         activeCondition={state.data.activeCondition}
         intensity={state.data.intensity}
         showOriginal={state.data.showOriginal}
+        webcamMode={state.data.webcamMode ?? false}
+        onWebcamModeChange={handleWebcamModeChange}
         canvasRef={canvasRef}
         onUpload={handleUpload}
       />
