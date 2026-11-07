@@ -36,6 +36,7 @@ describe("visionTool.deserialize - DeserializeResult contract", () => {
       showOriginal: false,
       results: [],
       notes: "",
+      webcamMode: false,
     });
   });
 

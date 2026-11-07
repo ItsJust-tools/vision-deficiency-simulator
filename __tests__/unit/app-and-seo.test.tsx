@@ -104,12 +104,13 @@ describe("app and seo", () => {
         showOriginal: false,
         results: [],
         notes: "",
+        webcamMode: false,
       },
     });
     expect(visionTool.deserialize({ nope: true })).toEqual({
       success: false,
       error:
-        "Invalid data format: expected { uploadMode: boolean, imageSrc?: string, activeCondition: string, intensity: number, results?: SimulationResult[], notes?: string }",
+        "Invalid data format: expected { uploadMode: boolean, imageSrc?: string, activeCondition: string, intensity: number, results?: SimulationResult[], notes?: string, webcamMode?: boolean }",
     });
     expect(
       visionTool.serialize({

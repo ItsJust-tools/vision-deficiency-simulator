@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import Image from "next/image";
+import { useWebcam, type WebcamStatus } from "@/tool/hooks/use-webcam";
 import {
   visionFilters,
   colorMatrices,
@@ -15,6 +16,8 @@ interface ToolCanvasProps {
   showOriginal: boolean;
   canvasRef?: React.RefObject<HTMLDivElement | null>;
   onUpload?: (imageSrc: string) => void;
+  webcamMode?: boolean;
+  onWebcamModeChange?: (on: boolean) => void;
 }
 
 /**
@@ -37,8 +40,22 @@ export function ToolCanvas({
   showOriginal,
   canvasRef,
   onUpload,
+  webcamMode = false,
+  onWebcamModeChange,
 }: ToolCanvasProps) {
   const [isDragOver, setIsDragOver] = useState(false);
+  const { videoRef, status: webcamStatus, errorMessage, start, stop } =
+    useWebcam();
+
+  const handleWebcamToggle = useCallback(() => {
+    if (webcamMode) {
+      stop();
+      onWebcamModeChange?.(false);
+    } else {
+      onWebcamModeChange?.(true);
+      void start();
+    }
+  }, [webcamMode, onWebcamModeChange, start, stop]);
 
   const fileName = getDisplayFilename(imageSrc);
 
@@ -192,6 +209,111 @@ export function ToolCanvas({
             >
               Supported: PNG, JPEG, WebP, GIF
             </div>
+            <div style={{ marginTop: "0.5rem" }}>
+              <button
+                type="button"
+                onClick={handleWebcamToggle}
+                aria-pressed={webcamMode}
+                aria-label="Use webcam or camera stream for live vision simulation"
+                style={{
+                  padding: "0.5rem 1rem",
+                  border: webcamMode
+                    ? "2px solid var(--accent)"
+                    : "1px solid var(--border)",
+                  borderRadius: "var(--radius)",
+                  background: webcamMode
+                    ? "var(--accent-subtle)"
+                    : "var(--card)",
+                  color: webcamMode ? "var(--accent)" : "var(--foreground)",
+                  cursor: "pointer",
+                  fontWeight: 500,
+                  fontFamily: "inherit",
+                  fontSize: "0.8125rem",
+                }}
+              >
+                📷 Use Webcam / Camera Stream
+              </button>
+            </div>
+            {webcamMode && webcamStatus !== "active" && (
+              <div
+                role="status"
+                style={{
+                  fontSize: "0.75rem",
+                  color:
+                    webcamStatus === "starting" || webcamStatus === "idle"
+                      ? "var(--muted)"
+                      : "var(--destructive, #c0392b)",
+                  textAlign: "center",
+                  maxWidth: "24rem",
+                }}
+              >
+                {webcamStatus === "starting" || webcamStatus === "idle"
+                  ? "Requesting camera access…"
+                  : errorMessage}
+              </div>
+            )}
+            {webcamMode && (
+              <div
+                className="webcam-container"
+                style={{
+                  position: "relative",
+                  maxWidth: "100%",
+                  maxHeight: "80vh",
+                  overflow: "hidden",
+                }}
+              >
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  aria-label="Live camera feed shown with vision deficiency simulation"
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "80vh",
+                    objectFit: "contain",
+                    display: "block",
+                  }}
+                  data-testid="webcam-video"
+                />
+                {!showOriginal &&
+                  (isGlaucoma ? (
+                    <>
+                      <div
+                        className="vision-overlay"
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          pointerEvents: "none",
+                          filter: activeFilter.cssFilter,
+                          opacity: intensity / 100,
+                        }}
+                      />
+                      <div
+                        className="glaucoma-overlay"
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          pointerEvents: "none",
+                          background: `radial-gradient(circle at center, transparent ${100 - intensity}%, rgba(0,0,0,0.85) 100%)`,
+                          opacity: intensity / 100,
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <div
+                      className="vision-overlay"
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        pointerEvents: "none",
+                        filter: activeFilter.cssFilter,
+                        opacity: intensity / 100,
+                      }}
+                    />
+                  ))}
+              </div>
+            )}
           </div>
         ) : (
           <>
